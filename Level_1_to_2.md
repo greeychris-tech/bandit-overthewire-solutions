@@ -8,7 +8,7 @@
 *   **Target Host IP/Domain:** `bandit.labs.overthewire.org`
 *   **Target Destination Port:** `2220`
 *   **Initial Low-Privilege Username:** `bandit1`
-*   **Initial Plaintext Password:** `6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR`
+*   **Initial Plaintext Password:** `[REDACTED_LEVEL_1_SECRET_TOKEN]`
 
 ---
 
