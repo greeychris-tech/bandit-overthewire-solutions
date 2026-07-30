@@ -36,7 +36,7 @@ Booted the Kali Linux Virtual Machine and initiated a standard desktop terminal 
    ssh bandit1@bandit.labs.overthewire.org -p 2220
    ```
 2. **Cryptographic Challenge:** Received the remote host's cryptographic authentication challenge. 
-3. **Authentication:** Submitted the plaintext initialization credential (`6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR`) at the remote system password prompt.
+3. **Authentication:** Submitted the plaintext initialization credential (` [REDACTED_LEVEL_1_SECRET_TOKEN] `) at the remote system password prompt.
 4. **Access Granted:** Successfully authenticated past the perimeter firewall, landing on the remote server's active text shell environment: `bandit1@bandit~$`.
 
 ### Data Extraction Sequence
