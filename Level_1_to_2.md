@@ -27,6 +27,8 @@
 
 ### Environment Baseline Audit
 Booted the Kali Linux Virtual Machine and initiated a standard desktop terminal session.
+> [!NOTE]  
+> **Telemetry & Documentation Methodology:** Terminal executions utilize sequential `echo` string formatting to force real-time thought-process tracking and inline commentary directly into the shell session. This logging approach serves as an audit trail for step-by-step verification within isolated target environments.
 
 ### Network Execution & Shell Access Sequence
 1. **Initiate SSH Connection:** Fired up the native Secure Shell utility:
@@ -38,6 +40,7 @@ Booted the Kali Linux Virtual Machine and initiated a standard desktop terminal 
 4. **Access Granted:** Successfully authenticated past the perimeter firewall, landing on the remote server's active text shell environment: `bandit1@bandit~$`.
 
 ### Data Extraction Sequence
+
 5. **Directory Inspection:** Executed the `ls` command on the target server filesystem, identifying a target file asset titled `-`.
 6. **Payload Extraction:** Executed the shell command string to extract the plaintext payload string hidden within the file layer:
    ```bash
