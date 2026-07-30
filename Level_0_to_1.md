@@ -16,6 +16,12 @@ Target Host IP/Domain:
 
     Initial Plaintext Password: bandit0
 
+  
+> [!NOTE]  
+> **Milestone & Lab Environment Retrospective:** 
+> This document represents my very first technical markdown report. During the initial environment baseline audit, a local conflict with a lingering automation script (`setup_complete_bandit.sh`) required mapping explicit binary paths (`/usr/bin/ssh`) to force clean execution. Artifacts from this troubleshooting account for the legacy *Natas* track string in the target metadata box—this formatting and environment layout was fully standardized and polished forward from Level 1-2.
+
+
 2. INFRASTRUCTURE & LABORATORY PRE-REQUISITES
 
     Hardware Layer: ASUS Vivobook Laptop (Configured with 16GB Total RAM / 512GB SSD / Windows Host OS).
