@@ -1,5 +1,7 @@
 # Penetration Testing Lab Report: OverTheWire (Bandit 1)
 
+> ⚠️ **Note:** This level was documented using my Phase 1 legacy workflow (prior to engineering my split-screen logging system). 
+
 ## 1. Target Identification & Source Reconnaissance
 
 *   **Lab Provider:** OverTheWire Wargames Community
