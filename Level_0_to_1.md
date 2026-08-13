@@ -1,3 +1,5 @@
+> ⚠️ **Note:** This level was documented using my Phase 1 legacy workflow (prior to engineering my split-screen logging system). 
+
 1. TARGET IDENTIFICATION & SOURCE RECONNAISSANCE
 
 Lab Provider: OverTheWire Wargames Community
