@@ -10,3 +10,8 @@
 
 
 Professional write-ups, environment documentation, and system audit logs for the OverTheWire Bandit cybersecurity challenges.
+
+> ⚠️ **Note on Level Verification Artifacts:** 
+> Due to file corruption during storage, several level-completion screenshots were partially damaged. 
+> The images have been cropped to salvage the intact data and preserve the necessary text artifacts 
+> required to verify level completion.
