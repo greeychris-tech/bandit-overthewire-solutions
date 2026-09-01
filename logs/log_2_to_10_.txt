@@ -1,0 +1,285 @@
+:::: LOG FILE ::::
+------------------------------------
+
+This is my LOG FILE for BOTW. Please take a look at this log for all notes and commands used, along with thought process.
+
+Currently: Creating a better workflow and showcasing the commands or codes we are using in order to make a better workflow. Trial and error.
+
+====================================
+
+# [TRIAL 1] Tried tracking native shell history directly
+# Code: tail -f ~/.bash_history | grep --line-buffered "^#"
+# Result: FAILED. Bash history buffers in memory; notes delayed or glitched.
+
+# [TRIAL 2] Shifted to a dedicated file stream using echo redirects
+# Code: echo "# note" >> ~/notes.txt
+# Result: SUCCESS, but formatting was too tight and single-line aliases glitched on special characters.
+
+# [FINAL SOLUTION] Created a clean custom function block with dashed dividers
+# Code: Used a multi-line bash function for clean spacing and automated dashed lines.
+# Result: SUCCESS. Perfect spacing, automated hashtags, and structural dividers.
+
+====================================
+
+# [TRIAL 3] Tried defining a multi-line function named 'note'
+# Code: note() { printf ... }
+# Result: FAILED with "parse error near ()".
+# Reason: An old alias named 'note' was conflicting with the new function definition.
+
+# [FINAL SOLUTION 2] Cleared the terminal memory using unalias before creating the function
+# Code: unalias note && note() { printf ... }
+# Result: SUCCESS. The alias conflict was removed, allowing the function to execute perfectly.
+
+====================================
+
+# Starting Bandit Over The Wire 
+
+====================================
+
+# Authenticated to the remote host via SSH using the previously exfiltrated Level 2 credential string.      
+                                    
+                                    
+
+# [TRIAL 4] Attempted running the 'note' command inside the Bandit SSH session
+# Code: note [message] (while logged into bandit@bandit.labs.overthewire.org)
+# Result: FAILED with "Permission denied".
+# Reason: The 'note' function and 'notes.txt' reside on the local VM. Once SSH connects, the local terminal executes commands on the remote server instead.
+
+# [FINAL SOLUTION 3] Transitioned to a 3-Terminal / 3-Pane Tilix Architecture
+# Setup: 
+#   - Terminal 1 (Left/Top): Active Bandit SSH Session (Gameplay Only)
+#   - Terminal 2 (Left/Bottom): Local VM Shell (For typing 'note [message]')
+#   - Terminal 3 (Right): Live Output Stream (tail -f ~/notes.txt)
+# Result: SUCCESS. Complete separation of game input and note input.
+
+====================================
+
+# Logged into Level 2 successfully. Ran ls and found a file named 'spaces in this filename'.     # [TRIAL 5] System prompted "Command 'note' not found, but can be installed with..."
+# Action: Selected 'No' to avoid installing unwanted system software.
+# Reason: The Linux package manager intercepted the missing command, assuming it was a known external program rather than recognizing it as our custom local script.      
+                                    
+                                    
+
+# package installer bypassed function is active
+------------------------------------
+
+# 
+------------------------------------
+
+# [ALERT] SSH Connection was closed by the remote OverTheWire server due to inactivity.
+# Action: Must re-authenticate via SSH and start the connection again from the beginning.
+# [GLITCH] A formatting error occurred where a note failed to write due to a 'bad pattern' shell conflict.
+# Reason: Using certain special symbols (like wildcards or unescaped characters) inside a raw command can disrupt the shell function's pattern matching.
+# Fix: Re-declared the safe printf note engine to stabilize input processing.
+====================================
+
+# [TRIAL 7] System prompted "Command 'note' not found, but can be installed with..."
+# Action: Selected 'No' to avoid installing unwanted system software.
+# Reason: The Linux package manager intercepted the missing command, assuming it was a known external program rather than recognizing it as our custom local script.
+# [FINAL SOLUTION 5] Declared the local shell function to override the package manager hook.
+# Result: SUCCESS. The shell now routes the word 'note' to our text file instead of searching the web for an installer.
+====================================
+
+# [TRIAL 9] Ran cat "spaces in this filename" inside Level 2
+# Result: FAILED. The system could not read or locate the file using manual quotes.
+# Understanding: Likely due to a hidden formatting character in the filename.
+# Next Action: Switching to the terminal's built-in Tab-completion engine to let the system format the spaces automatically.
+====================================
+
+# [TRIAL 10] Attempted Tab autocomplete with 'cat spaces'
+# Result: FAILED. Output stated 'No such file or directory' and Tab key did nothing.
+# Understanding: Autocomplete fails when the shell cannot find any file matching those characters in the current working directory.
+# Next Action: Running location discovery commands ('pwd' and 'ls -la') to verify the current directory environment.
+====================================
+
+# [DISCOVERY] Visual inspection via 'ls -la' revealed the true file name structure.
+# Finding: The file is actually named '--spaces in this filename--' (with leading and trailing dashes).
+# Understanding: The double leading dash ('--') causes the 'cat' command to misinterpret the filename as an option switch, which broke normal reading and Tab autocomplete.
+# Next Action: Using the absolute current path specifier './' to force the shell to treat the dashes as a plain filename.
+====================================
+
+# [PROGRESS] Bandit Level 2 -> Level 3
+# Solution: Executed 'cat "./--spaces in this filename--"'.
+# Result: SUCCESS! Prepending './' forced the shell to treat the dashes as a literal file path rather than a command flag.
+# Outcome: Level 3 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 3
+# Status: SUCCESS. The retrieved password from Level 2 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 3 workspace.
+====================================
+
+#  Bandit Level 3
+====================================
+
+# [DISCOVERY] Inspected the Bandit Level 3 home directory
+# Finding: Running 'ls -la' revealed the basic system directories along with a hidden space directory structure.
+# Understanding: The path to the next password requires digging into the hidden file landscape using specific directory traversal flags.
+# Next Action: Navigating into the hidden directory to find the concealed password file.
+====================================
+
+# [DISCOVERY] Located target file inside the directory.
+# Finding: Exposed a hidden file explicitly named '...Hiding-From-You'.
+# Understanding: The three dots ('...') are a deliberate obfuscation technique used to mimic system navigation pointers (. and ..) and hide the file from plain sight.
+# Next Action: Running the 'cat' command on the literal filename to read the password string.
+====================================
+
+# [PROGRESS] Bandit Level 3 -> Level 4
+# Solution: Executed 'cat "...Hiding-From-You"'.
+# Result: SUCCESS! Wrapping the multi-dot filename in quotes safely printed the text string.
+# Outcome: Level 4 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 4
+# Status: SUCCESS. The retrieved password from Level 3 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 4 workspace.
+====================================
+
+# Bandit Level 4
+====================================
+
+# [DISCOVERY] Inspected the Bandit Level 4 'inhere' directory
+# Finding: Located ten files named '-file00' through '-file09'.
+# Challenge: The files look identical, and leading dashes ('-') will interfere with basic shell commands.
+# Next Action: Using the 'file' command combined with a wildcard specifier ('./*') to inspect the data profiles of all files simultaneously.
+====================================
+
+# [DISCOVERY] Data profiling completed via the 'file' utility.
+# Finding: './-file07' was uniquely identified as 'ASCII text', while all other files contained raw non-text data.
+# Understanding: Identifying data types programmatically avoids having to manually open and sift through unreadable binary contents.
+# Next Action: Executing 'cat' with the './' path specifier to safely read the text inside './-file07'.
+====================================
+
+# [PROGRESS] Bandit Level 4 -> Level 5
+# Solution: Executed 'cat ./-file07'.
+# Result: SUCCESS! The file utility accurately isolated the human-readable text vector.
+# Outcome: Level 5 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 5
+# Status: SUCCESS. The retrieved password from Level 4 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 5 workspace.
+====================================
+
+# Bandit Level 5
+====================================
+
+# [DISCOVERY] Entered the Bandit Level 5 'inhere' directory
+# Finding: Located the standard 'inhere' deployment gateway.
+# Challenge: The target directory contains deep nested structures that require automated advanced search parameters.
+# Next Action: Deploying the 'find' command to filter the directory tree by specific file type and size parameters.
+====================================
+
+# [DISCOVERY] Manual verification showed 19 nested subdirectories inside 'inhere'.
+# Search Tool: Executed 'find inhere/ -type f -size 1033c' to scan the entire tree.
+# Finding: Programmatically isolated the hidden target path: 'inhere/maybehere07/.file2'.
+# Understanding: Combining precise file size and object type parameters allows for instant data filtering across vast file systems.
+# Next Action: Executing 'cat' on the discovered path to read the password.
+====================================
+
+# [DISCOVERY] Password retrieved successfully from 'inhere/maybehere07/.file2'.
+# Behavior: The file output injected a large block of trailing whitespace or newline characters onto the screen.
+# Understanding: OverTheWire files occasionally embed padding or trailing white spaces around strings to mimic raw data packets or test shell formatting resilience.
+# Outcome: Level 6 password safely captured despite the terminal layout distortion.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 6
+# Status: SUCCESS. The retrieved password from Level 5 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 6 workspace.
+====================================
+
+# Bandit Level 6
+====================================
+
+# [DISCOVERY] Inspected Bandit Level 6 home directory.
+# Finding: 'ls -la' returned only basic system configuration dotfiles. No levels files are present here.
+# Challenge: The target file is hidden globally on the root server file system rather than locally.
+# Next Action: Executing 'find' from the root ('/') filtering for user, group, and byte size, while silencing permission errors via standard error redirection.
+====================================
+
+# [TRIAL 11] Executed global root search for user bandit7, group bandit6, size 33c.
+# Result: BLANK. The terminal returned zero paths and no errors.
+# Understanding: Root system scans can occasionally timeout, stall under severe server load, or fail if a flag format matches tightly restricted hidden directories.
+# Next Action: Modifying search criteria to scan target system directories individually to trace where the file is hiding.
+====================================
+
+# [DISCOVERY] Narrowed root search down to the /var/ system directory.
+# Finding: Successfully isolated the hidden path: '/var/lib/dpkg/info/bandit7.password'.
+# Understanding: Restricting the search scope to core mutable system trees (/var/) bypasses heavy server load blocks and reveals globally hidden level assets.
+# Next Action: Running 'cat' on the verified path to extract the Level 7 password.
+====================================
+
+# [PROGRESS] Bandit Level 6 -> Level 7
+# Solution: Executed 'cat /var/lib/dpkg/info/bandit7.password'.
+# Result: SUCCESS! Safely bypassed global server obfuscation and read the target file contents.
+# Outcome: Level 7 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 7
+# Status: SUCCESS. The retrieved password from Level 6 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 7 workspace.
+====================================
+
+# Bandit Level 7
+====================================
+
+# [DISCOVERY] Located a large data repository file: 'data.txt'.
+# Challenge: Reading the file entirely with 'cat' will overflow the shell with text.
+# Next Action: Using the 'grep' keyword filter tool to search 'data.txt' for the string 'millionth' and isolate the password line.
+====================================
+
+# [PROGRESS] Bandit Level 7 -> Level 8
+# Solution: Executed 'grep "millionth" data.txt'.
+# Result: SUCCESS! The grep tool bypassed millions of lines and instantly printed the exact line containing the word.
+# Outcome: Level 8 password successfully revealed on screen.
+====================================
+
+# Bandit Level 8
+====================================
+
+# [DISCOVERY] Exploring Bandit Level 8 environment.
+# Clarification: Verified that Level 8 does not utilize SQL or databases; it focuses entirely on flat-file text parsing.
+# Challenge: 'data.txt' contains heavily repeated lines. The password is the only line that appears exactly once.
+# Tool Theory: The 'uniq' tool requires adjacent matching lines. Therefore, data must be structurally sorted before deduplication can occur.
+# Next Action: Piping the output of 'sort' into 'uniq -u' to cleanly isolate the single unique password string.
+====================================
+
+# [PROGRESS] Bandit Level 8 -> Level 9
+# Solution: Executed 'sort data.txt | uniq -u'.
+# Result: SUCCESS! Alphabetizing the text forced duplicates together, allowing 'uniq -u' to drop everything except the single unique password.
+# Outcome: Level 9 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 9
+# Status: SUCCESS. The retrieved password from Level 8 was accepted by the server.
+# Current State: Terminals are synchronized. Ready to explore the Level 9 workspace.
+====================================
+
+# Bandit Level 9
+====================================
+
+# [DISCOVERY] Located 'data.txt' inside Bandit Level 9.
+# Challenge: The file contains raw binary data, which will break or corrupt standard text reading attempts.
+# Next Action: Using the 'strings' utility to strip away the binary junk and piping the output into 'grep' to look for the '=' markers.
+====================================
+
+# [PROGRESS] Bandit Level 9 -> Level 10
+# Solution: Executed 'strings data.txt | grep "=="' inside the remote Bandit shell.
+# Result: SUCCESS! The 'strings' utility ignored the unreadable binary data blocks and isolated the readable ASCII string next to the equal signs.
+# Note: Encountered a minor local error when accidentally running the command in the VM terminal instead of the active SSH connection pane.
+# Outcome: Level 10 password successfully revealed on screen.
+====================================
+
+# [PROGRESS] Bandit Level 9 -> Level 10 Successfully Verified
+# Status: SUCCESS. Safely logged into Bandit Level 10 using the extracted password hash.
+# Operational Decision: Pausing active gameplay at Level 10 to execute administrative and engineering tasks.
+# Task 1 - Asset Sanitization: Preparing to scrub all raw password strings from the local file repository.
+# Purpose: Protect operational security (OpSec) by generating a clean 'notes_sanitized.txt' before publishing.
+# Task 2 - Jira Documentation: Exporting the troubleshooting journey and level metrics into Jira tickets using platform-specific panel/code markup.
+# Task 3 - GitHub Integration: Creating a permanent repository file to house our trial-and-error logs using standard GitHub Flavored Markdown (.md).
+====================================
+
+# END POINT - BANDIT LEVEL 10 
+
+# END POINT - BANDIT LEVEL 10 
+====================================
