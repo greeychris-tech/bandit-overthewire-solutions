@@ -1,0 +1,353 @@
+:::: LOG FILE 2 ::::
+------------------------------------
+
+This is my secondary LOG FILE for BOTW. Please take a look at this log for all notes and commands used, along with thought process.
+
+Currently: Initiating target environment analysis for Level 10. Evaluating data encoding vectors and extracting hidden credential strings.
+
+====================================
+
+# [DISCOVERY] Environmental triage of Bandit Level 10 workspace completed.
+# Telemetry: Identified target asset 'data.txt' (69 bytes) with appropriate group read permissions.
+# Assessment: The file size and structural specifications point to a Base64 encoded data vector.
+# Next Action: Deploying the 'base64 -d' decoder tool to extract the raw plaintext credential string.
+====================================
+
+# [PROGRESS] Bandit Level 10 -> Level 11 Successful Extraction
+# Solution: Executed 'base64 -d data.txt' against the target asset.
+# Result: SUCCESS! Reversed the encoding matrix and stripped the ASCII representation down to raw plaintext.
+# Outcome: Level 11 password string successfully printed and captured.
+====================================
+
+# Bandit Level 11
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 11
+# Analyst Rationale: After identifying the Base64 encoding signature in Level 10 and successfully decoding it, I isolated the plaintext access hash. I am explicitly migrating sessions now because our active threat footprint must advance in tandem with recovered credentials.
+# Action: Executed SSH handshake to pivot from user bandit10 to bandit11 on port 2220.
+# Verification: SUCCESS. Access token authenticated successfully. Established a stable remote terminal session.
+====================================
+
+# [PERSPECTIVE] Environmental Scan & Cryptographic Analysis - Level 11
+# Analyst Rationale: Located 'data.txt' (49 bytes). System markers indicate a ROT13 shift cipher is active.
+# Justification: I am deploying the native 'tr' (translate) utility instead of manual translation because it allows us to programmatically map and swap characters instantly over standard input pipelines.
+# Operational Plan: Pipe the contents of 'data.txt' through 'tr' to rotate all lowercase and uppercase letters back by 13 positions.
+====================================
+
+# [PROGRESS] Bandit Level 11 -> Level 12 Cipher Decryption
+# Solution: Executed 'cat data.txt | tr \'A-Za-z\' \'N-ZA-Mn-za-m\''.
+# Analyst Rationale: The symmetrical nature of ROT13 meant that passing the obfuscated text stream through a 13-character translate matrix would naturally reconstruct the original ASCII baseline. This approach successfully avoided manual cryptanalysis.
+# Outcome: SUCCESS. De-obfuscated the text artifact and secured the cleartext Level 12 credentials.
+====================================
+
+# [METHODOLOGY AUDIT] Enhancing Diagnostic Transparency in Reporting
+# Analyst Assessment: Identified a structural gap in our previous logs. While the execution parameters were correct, the reporting lacks the diagnostic breadcrumbs showing HOW a cipher or data vector was identified prior to running the solution.
+# Remediation Protocol: Moving forward into Level 12, we will explicitly mandate an initial 'Diagnostic and Profiling' phase. We will document the structural anomalies of the data artifacts to justify our choice of reverse-engineering tools.
+====================================
+
+#  Bandit Level 12
+====================================
+
+# [DIAGNOSTIC PHASE] Structural Profiling of Level 12 Target Asset
+# Analyst Rationale: Located 'data.txt' with a footprint of 2641 bytes. Because the file size is significantly larger than typical flat-text credential hashes, a raw text read could compromise terminal stability or hide multi-layered compression wrappers.
+# Action: Deploying the 'file' utility to analyze the magic numbers and binary headers of 'data.txt' before selecting an extraction tool.
+====================================
+
+# [ANALYSIS] Forensic Assessment of Level 12 Hexdump Asset
+# Diagnostic Finding: 'file data.txt' returned 'ASCII text'.
+# Analyst Rationale: Cross-referencing the ASCII profile with threat intelligence indicates the file contains a text-based representation of a binary object (a hexdump). Reading the file directly will only show memory addresses and hex pairs.
+# Action Plan: I will inspect the top of the file via 'head' to visually confirm the hexdump layout, then deploy 'xxd -r' to reconstruct the original underlying binary file.
+====================================
+
+# [DIAGNOSTIC VERIFICATION] Hexdump Structural Magic Byte Analysis
+# Telemetry: 'head' output exposed a starting sequence of '1f8b' on the first hex offset line.
+# Analyst Sign-off: The bytes '1f 8b' map directly to the standardized file signature for Gzip (.gz) compression architectures. The header also names an embedded artifact: 'data2.bin'.
+# Operational Plan: Because we lack file creation privileges in the home folder, we will pivot to a local workspace in '/tmp', convert the text hexdump back into raw binary via 'xxd -r', and extract the archive.
+====================================
+
+# [VERIFICATION] Evaluating Silent Binary Reconstruction
+# Telemetry: 'xxd' command executed and returned a fresh prompt with zero textual error strings.
+# Analyst Rationale: Under standard POSIX constraints, successful operations suppress console output ('Silence is Golden'). To confirm the asset was written properly, we must perform an inline listing check.
+# Action: Deploying 'ls -la' to verify the presence, size, and health of the newly generated 'data2.gz' archive.
+====================================
+
+# [DECOMPRESSION PHASE] Peeling Layer 1 (Gzip Optimization)
+# Telemetry: 'ls -la' confirmed the presence of 'data2.gz' (613 bytes).
+# Analyst Rationale: Since the data profile matches a Gzip container signature, we will deploy the native 'gzip -d' extraction tool. This will process the file block and extract the embedded file metadata we spotted earlier.
+# Action: Executing 'gzip -d data2.gz' to unpack the data layer.
+====================================
+
+# [PROGRESS] Layer 1 Decompression Successful
+# Telemetry: 'gzip -d' executed with a clean, silent exit status.
+# Analyst Rationale: Decompressing a Gzip archive drops the '.gz' suffix and automatically restores the inner payload file name. I am running a directory scan next to verify the file name change.
+# Action: Deploying 'ls -la' to locate the new payload file.
+====================================
+
+# [DIAGNOSTIC PHASE] Analysis of Extracted Asset 'data2'
+# Telemetry: 'ls -la' confirmed 'data2.gz' expanded into a 580-byte flat binary artifact named 'data2'.
+# Analyst Rationale: We cannot assume this asset is plain text or another Gzip archive. I am deploying the 'file' utility to analyze its magic numbers and pinpoint the next compression algorithm.
+# Action: Running 'file data2' to discover its underlying data structure.
+====================================
+
+# [DIAGNOSTIC PHASE] Bzip2 Compression Signature Identified
+# Telemetry: 'file data2' returned 'bzip2 compressed data, block size = 900k'.
+# Analyst Rationale: The file utility successfully read the block-sorting header signature. To safely unpack this layer without altering permission sets, I am deploying the cross-compatible 'bzip2 -d' engine.
+# Action: Renaming the file to match standard file extensions and executing 'bzip2 -d' to extract the next embedded layer.
+====================================
+
+# [PROGRESS] Layer 2 Bzip2 Decompression Successful
+# Telemetry: 'bzip2 -d' executed with a clean, silent exit status.
+# Analyst Rationale: Stripping the Bzip2 container layer drops the '.bz2' extension and automatically writes the inner payload back to disk. I am running a directory scan to verify the new uncompressed asset name.
+# Action: Deploying 'ls -la' to locate the new payload file.
+====================================
+
+# [DIAGNOSTIC PHASE] Gzip Compression Loop Detected (Layer 3)
+# Telemetry: 'file data2' returned 'gzip compressed data, was "data4.bin"'.
+# Analyst Rationale: The data layer has cycled back to a Gzip format. To unpack it and cleanly drop the metadata envelope into our temporary sandbox workspace, I will execute the standard Gzip extraction command stream.
+# Action: Appending the '.gz' suffix and deploying 'gzip -d' to isolate the underlying 'data4.bin' asset.
+====================================
+
+# [PROGRESS] Layer 3 Gzip Decompression Successful
+# Telemetry: 'gzip -d' executed with a clean, silent exit status.
+# Analyst Rationale: The system has unpacked the container. Based on the header metadata metadata we uncovered earlier, the output asset should have defaulted to its original name: 'data4.bin'. I am running an inline sweep to confirm.
+# Action: Deploying 'ls -la' to verify file extraction metrics.
+====================================
+
+# [EXCEPTION HANDLER] File Resolution Deficit - Layer 3
+# Telemetry: 'file data4.bin' returned 'No such file or directory'.
+# Analyst Assessment: Investigation reveals that 'gzip -d' strips the extension but retains the core filename string of the archive container ('data2') rather than automatically utilizing the embedded header metadata string ('data4.bin').
+# Remediation Protocol: I will execute a basic directory listing ('ls -la') to pinpoint the actual file descriptor left on disk and run our diagnostic 'file' command against that asset.
+====================================
+
+# [DIAGNOSTIC PHASE] Tar Archive Envelope Identified (Layer 4)
+# Telemetry: 'file data2' returned 'POSIX tar archive (GNU)'.
+# Analyst Rationale: The file system layer has shifted from block compression to an archive envelope. To unpack the nested contents while tracking any file extraction indicators, I will deploy the native 'tar' engine with verbose reporting enabled.
+# Action: Executing 'tar -xvf data2' to unpack the archived assets into the local sandbox directory.
+====================================
+
+# [PROGRESS] Layer 4 Tar Archive Extraction Successful
+# Telemetry: 'tar -xvf data2' executed and explicitly outputted 'data5.bin'.
+# Analyst Rationale: The archive layer has been fully unpacked, exposing a new binary footprint. To determine our next decryption tool, I am running a diagnostic check against this new asset header.
+# Action: Deploying 'file data5.bin' to analyze the magic numbers of the unpacked asset.
+====================================
+
+# [DIAGNOSTIC PHASE] Multi-Layered Tar Archive Detected (Layer 5)
+# Telemetry: 'file data5.bin' confirmed a secondary 'POSIX tar archive (GNU)' block structure.
+# Analyst Rationale: The system layout features stacked, duplicate archiving layers to test extraction consistency. I will replicate our proven 'tar' extraction routine against this specific node to extract the underlying file matrix.
+# Action: Executing 'tar -xvf data5.bin' to unpack the archived assets into the local sandbox directory.
+====================================
+
+# [PROGRESS] Layer 5 Tar Archive Extraction Successful
+# Telemetry: 'tar -xvf data5.bin' executed and explicitly outputted 'data6.bin'.
+# Analyst Rationale: The secondary archive layer has been fully unpacked, exposing a new binary footprint. To determine our next decryption tool, I am running a diagnostic check against this new asset header.
+# Action: Deploying 'file data6.bin' to analyze the magic numbers of the unpacked asset.
+====================================
+
+# [DIAGNOSTIC PHASE] Bzip2 Compression Loop Detected (Layer 6)
+# Telemetry: 'file data6.bin' returned 'bzip2 compressed data, block size = 900k'.
+# Analyst Rationale: The artifact footprint has transitioned back to a block-sorting compression matrix. I am applying the standard '.bz2' extension to ensure proper tool interaction and deploying the 'bzip2' engine.
+# Action: Renaming the asset to 'data6.bin.bz2' and running 'bzip2 -d' to decompress the block layer.
+====================================
+
+# [PROGRESS] Layer 6 Bzip2 Decompression Successful
+# Telemetry: 'bzip2 -d' executed with a clean, silent exit status.
+# Analyst Rationale: Dismantling the Bzip2 block compression strips the extension and returns a fresh payload binary file named 'data6.bin' to disk. I am performing a follow-up environment listing to verify.
+# Action: Deploying 'ls -la' and 'file data6.bin' to capture the new file data signature.
+====================================
+
+# [DIAGNOSTIC PHASE] Tar Archive Envelope Identified (Layer 7)
+# Telemetry: 'file data6.bin' returned 'POSIX tar archive (GNU)'.
+# Analyst Rationale: The data file configuration has pivoted back to an archive envelope wrapper. I am deploying the native 'tar' engine with verbose reporting enabled to safely unpack the payload and extract its contents.
+# Action: Executing 'tar -xvf data6.bin' to unpack the archived assets into the local sandbox directory.
+====================================
+
+# [PROGRESS] Layer 7 Tar Archive Extraction Successful
+# Telemetry: 'tar -xvf data6.bin' executed and explicitly outputted 'data8.bin'.
+# Analyst Rationale: The seventh layer of archiving has been completely disassembled, exposing a new binary footprint. I am running an immediate diagnostic profiling scan on the header of 'data8.bin' to identify its encoding or compression algorithm.
+# Action: Deploying 'file data8.bin' to analyze the magic numbers of the unpacked asset.
+====================================
+
+# [DIAGNOSTIC PHASE] Gzip Container Detected - Final Layer Approaching (Layer 8)
+# Telemetry: 'file data8.bin' returned 'gzip compressed data, was "data9.bin", size modulo 2^32 49'.
+# Analyst Rationale: The compressed envelope reveals an uncompressed data projection of exactly 49 bytes. This highly restricted footprint indicates the inner payload is the final raw credential token asset. I will deploy Gzip extraction mechanics to crack this terminal layer.
+# Action: Renaming the asset to 'data8.bin.gz' and running 'gzip -d' to decompress the file container.
+====================================
+
+# [PROGRESS] Layer 8 Gzip Decompression Successful
+# Telemetry: 'gzip -d' executed with a clean, silent exit status.
+# Analyst Rationale: The eighth container layer has been stripped, exposing the raw uncompressed 49-byte file footprint onto the local disk space. I am executing an environmental survey to profile this final asset.
+# Action: Deploying 'ls -la' and 'file data8.bin' to verify the core data signature.
+====================================
+
+# [DIAGNOSTIC PHASE] Plaintext Payload Verification
+# Telemetry: 'file data8.bin' returned 'ASCII text'.
+# Analyst Sign-off: All compression and archive wrappers have been successfully removed. The signature verification confirms raw ASCII text strings are exposed. This node marks the end of our forensic extraction routine.
+# Action: Executing 'cat' on 'data8.bin' to read the cleartext password hash for Level 13.
+====================================
+
+# [PROGRESS] Bandit Level 12 -> Level 13 Forensic Loop Complete
+# Solution: Executed 'cat data8.bin' inside the custom temporary workspace.
+# Analyst Rationale: By methodically tracing magic bytes across eight alternate layers of block-sorting compression (Bzip2), stream compression (Gzip), and data packaging (Tar), we successfully isolated the core plaintext vector.
+# Outcome: SUCCESS. Retrieved the cleartext password hash for the Level 13 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 13
+# Analyst Rationale: Following the extraction of the raw ASCII password string from the multi-layered compression loop in Level 12, I am pivoting our active infrastructure footprint up to the Level 13 security tier.
+# Action: Executed an SSH handshake to transition from user bandit12 to bandit13 on port 2220.
+# Verification: SUCCESS. Access token authenticated successfully. Established a stable remote terminal session inside the target workspace.
+====================================
+
+# Bandit Level 13
+====================================
+
+# [PERSPECTIVE] Environmental Scan & Credential Exploitation - Level 13
+# Telemetry: 'ls -la' exposed an unsecured 2602-byte private cryptographic asset named 'sshkey.private'.
+# Analyst Rationale: Cross-referencing threat intelligence indicates that local file system reads against the Level 14 password file are restricted. However, the presence of an exposed private SSH key file presents an authentication bypass vector.
+# Justification: I will deploy the native 'ssh' client passing the identity flag (-i) to authenticate locally as user bandit14. This allows us to elevate privileges safely using cryptography rather than brute-forcing text hashes.
+# Operational Plan: Execute a local loopback SSH connection to localhost using 'sshkey.private' as the identity proof.
+====================================
+
+# [SECURITY HANDSHAKE] Host Authenticity Verification
+# Telemetry: Received standard SSH warning: 'The authenticity of host [localhost]:2220 can't be established'.
+# Analyst Assessment: This behavior is normal and expected during an initial local loopback hook. The system is prompting to write the ED25519 host fingerprint to the local known_hosts tracking file.
+# Action Justification: Authorizing the connection explicitly to complete the key exchange process.
+====================================
+
+# [EXCEPTION HANDLER] Local loopback connection blocked on external port.
+# Telemetry: Server returned: 'Connecting from localhost is blocked to conserve resources.'
+# Analyst Assessment: The infrastructure explicitly blocks internal loopback routing when mapped to the external port 2220 configuration. Inside the network perimeter, we must connect using the system's standard local port.
+# Remediation Protocol: Modifying the SSH command string to target 'localhost' on its default internal port (22) by completely stripping the external -p flag.
+====================================
+
+# [SECURITY HANDSHAKE] Default Local Interface Fingerprint Verification
+# Telemetry: System prompted for signature authorization on standard local socket interface (127.0.0.1).
+# Analyst Assessment: This verification parameter is required to initialize the cryptographic channel over default port 22 and bypass the restricted external tracking layer.
+# Action Justification: Explicitly authorizing the key registry entry to complete the local session escalation.
+====================================
+
+# [EXCEPTION HANDLER] Perimeter SSH Port Restrictions Analyzed
+# Telemetry: Port 22 explicitly denied publickey access ('not intended').
+# Analyst Assessment: Port 22 is disabled for internal pivots. The target service is listening exclusively on port 2220, but its resource firewall drops default connections to prevent password guessing from localhost.
+# Remediation Protocol: Re-targeting port 2220 while passing an explicit configuration override (-o PubkeyAuthentication=yes) to force an immediate cryptographic key exchange, bypassing the local password-block entirely.
+====================================
+
+# [SECURITY HANDSHAKE] Re-authorizing Host Signature on Target Port 2220
+# Telemetry: Received fingerprint validation prompt for local interface socket on target infrastructure port 2220.
+# Analyst Assessment: Normal behavior during an explicit configuration override session reset. Accepting the host fingerprint is required to finalize the forced public key handshake channel.
+# Action Justification: Authorizing the signature exchange to complete the privilege escalation exploit.
+====================================
+
+# [EXCEPTION HANDLER] Write-Lock Restrictions on Home Directory Detected
+# Telemetry: Received 'Could not create directory /.ssh (Permission denied)' and subsequent password loopback resource block.
+# Analyst Assessment: The user profile lacks write access to '/home/bandit13/', forcing the SSH engine to fail its caching routine. This directory friction causes the SSH client to fall back to interactive password prompts, tripping the resource firewall.
+# Remediation Protocol: Deploying a strict preference override flag (-o PreferredAuthentications=publickey) to forcefully disable password methods entirely, forcing a direct cryptographic-only handshake.
+====================================
+
+# [SECURITY HANDSHAKE] Direct Cryptographic Handshake Execution
+# Telemetry: System requested host fingerprint verification for localhost:2220 under restricted write-lock conditions.
+# Analyst Assessment: Expected validation sequence. Accepting the host fingerprint allows the client to immediately present 'sshkey.private' as the sole authentication mechanism, bypassing interactive fallbacks.
+# Action Justification: Granting final verification to clear the handshake barrier and execute privilege escalation.
+====================================
+
+# [EXCEPTION HANDLER] Forced Publickey Preference Defeated by Write-Lock Friction
+# Telemetry: Terminal output logs show that PreferredAuthentications was rejected, returning the exact same localhost port 2220 password restriction block.
+# Analyst Assessment: The home directory read-only lock prevents the SSH client subsystem from securely parsing the identity file configuration. Because the client cannot read 'sshkey.private' cleanly, it defaults to interactive password handshakes, which trips the resource firewall.
+# Remediation Protocol: Pivoting completely away from the SSH client architecture. Deploying 'nc' (Netcat) to establish a raw TCP connection to the server's internal receiving port, bypassing SSH processing restrictions entirely.
+====================================
+
+# [ANALYSIS] Netcat Connection Verified - Input Token Mismatch
+# Telemetry: Netcat successfully reached port 30000 but the server script rejected the file string input.
+# Analyst Assessment: Port 30000 is open and actively processing inputs. The failure occurred because the system file path did not contain the correct active session hash. We must submit the raw text password used to open this level.
+# Action Plan: I will retrieve our active Level 13 password string from our logs and feed it directly into the open Netcat socket.
+====================================
+
+# [DIAGNOSTIC DETOUR RESOLVED] Input Token Discrepancy Verified
+# Telemetry: Netcat directly rejected the validated Level 13 password hash with an invalid string error.
+# Analyst Assessment: Core network tracking parameters confirmed. The port 30000 authentication daemon is provisioned to receive the upcoming Level 14 access hash. We must complete our session privilege escalation before we can query the network socket.
+# Next Action: Re-focusing completely on our SSH private key escalation path, implementing environment arguments to override the home folder write-lock.
+====================================
+
+# [EXCEPTION HANDLER] Infinite Authentication Loop Identified
+# Telemetry: System repeatedly dropped connections with the localhost password resource block.
+# Analyst Assessment: The client is dropping the 'sshkey.private' reference because it cannot handle permissions in the read-only home directory, defaulting to password handshakes.
+# Next Action: Running a direct execution bypass by explicitly targeting the file with a relative path format.
+====================================
+
+# [EXCEPTION HANDLER] Defeating SSH Fingerprint Write Block
+# Telemetry: System explicitly returns write failures for /.ssh/known_hosts and defaults to password prompts.
+# Analyst Assessment: The home directory read-only enforcement prevents normal fingerprint caching. To stop the client from dropping our key and falling back to interactive passwords, we must containerize the signature phase.
+# Remediation Protocol: Deploying an inline configuration stream override to drop the signature into the /dev/null system sink, forcing key execution.
+====================================
+
+# [EXCEPTION HANDLER] SSH Client Loopback Loop Hard-Locked
+# Telemetry: Containerizing the known_hosts file still returned the port 2220 password-block alert.
+# Analyst Assessment: The native SSH client on this instance is hard-coded to ignore local key processing to enforce resource preservation. To break this restriction, we will append a direct execution command to the handshake to pull the token file out directly.
+# Action Plan: Execute an SSH key handshake that directly invokes a 'cat' command against the Level 14 file system path.
+====================================
+
+# [EXCEPTION HANDLER] Internal Loopback Vector Completely Hard-Locked
+# Telemetry: 'localhost' loops persistently trigger fallback states due to write-lock constraints on the local profile directory.
+# Analyst Assessment: Fighting the internal client routing configuration is inefficient. The local network boundary is explicitly tuned to drop loopback contexts.
+# Remediation Protocol: Pivoting our routing trajectory from 'localhost' to the public domain infrastructure point. This forces the server to handle the key exchange over its external interface.
+====================================
+
+# [SECURITY HANDSHAKE] External Public Domain Routing Handshake Initiated
+# Telemetry: Public perimeter interface successfully bypassed the internal localhost firewall loop, returning the initial host verification challenge.
+# Analyst Assessment: Typing 'yes' confirms authorization of the displayed fingerprint. This completes the handshake and forces the presentation of 'sshkey.private' directly to the target external socket configuration.
+# Action Plan: Submitting 'yes' to finalize network connection and escalate privileges.
+====================================
+
+# [STRATEGIC PIVOT] Direct Asset Exfiltration & Local Privilege Escalation
+# Analyst Assessment: The student identified a critical architectural workaround. Instead of fighting the broken local SSH loopback engine, we will attempt a direct local file read against the system password registry to bypass account isolation entirely.
+# Action Plan: Executing a direct 'cat' command against the global password database path to pull the Level 14 cleartext token directly into our visible space.
+====================================
+
+# [STRATEGIC PIVOT] Local Workstation Asset Re-Import Protocol
+# Telemetry: System explicitly returned 'Permission denied' against the direct global path read attempt.
+# Analyst Assessment: Account file security policies are strictly enforced on flat files. To implement the student's local migration play, we must move the key material out of the compromised environment entirely.
+# Action Plan: Exfiltrate the 'sshkey.private' key data to our local workstation, configure secure local POSIX permissions, and launch an authentication pipeline directly from our Kali VM.
+====================================
+
+# [STRATEGIC EXECUTION] Re-aligning Terminal Architecture and Asset Extraction
+# Telemetry: User profile has successfully escalated to bandit14 in the lower workspace.
+# Analyst Rationale: Closed the obsolete bandit13 session in the top pane to restore local logging workspace control. Proceeding to query the secure local credential store.
+# Action: Deploying a direct read against '/etc/bandit_pass/bandit14' in the active session pane.
+====================================
+
+# [PROGRESS] Bandit Level 13 -> Level 14 Absolute Password Resolution
+# Solution: Executed 'cat /etc/bandit_pass/bandit14' within the authenticated bandit14 profile window.
+# Result: SUCCESS! Privileged file system read successfully bypassed local isolation controls.
+# Outcome: Level 14 flat-text password hash successfully exposed, verified, and captured in our audit trail.
+====================================
+
+# [PROGRESS] Bandit Level 14 -> Level 15 Network Socket Submission
+# Telemetry: Initial transmission returned string rejection error due to minor character input mismatch.
+# Solution: Executed 'echo "[REDACTED_L14_HASH]" | nc localhost 30000' with corrected string parameters.
+# Result: SUCCESS! Server backend verified the authentication token and returned a 'Correct!' validation state.
+# Outcome: Level 15 plaintext password string successfully captured on screen.
+====================================
+
+# [PROGRESS] Bandit Level 14 -> Level 15 Network Socket Submission
+# Telemetry: Initial transmission returned string rejection error due to minor character input mismatch.
+# Solution: Executed 'echo "[REDACTED_L14_HASH]" | nc localhost 30000' with corrected string parameters.
+# Result: SUCCESS! Server backend verified the authentication token and returned a 'Correct!' validation state.
+# Outcome: Level 15 plaintext password string successfully captured on screen.
+====================================
+
+# [PROGRESS] Authenticated into Bandit Level 15
+# Status: SUCCESS. The retrieved network socket token was accepted by the remote gateway cluster.
+# Current State: Dynamic session established. Active investigation paused at Level 15 baseline.
+====================================
+
+# [CREDENTIAL VERIFICATION REGISTRY] Active Assessment Sign-Off
+# Tier 13 Cleartext Token: [RECORDED IN LOG 1]
+# Tier 14 Private Key Path: Rebuilt locally at '~/kali_bandit14.key' (Permissions verified 600).
+# Tier 14 Cleartext Password: [VERIFIED SYSTEM TOKEN METRIC]
+# Tier 15 Cleartext Password: [REDACTED_LEVEL_15_PASS]
+# Analyst Sign-off: All identity markers have been verified cross-functionally. The linear chain of custody from Level 13 through Level 15 is closed and validated.
+====================================
+# [ADMINISTRATIVE] Post-Assessment Data Sanitization Loop
+# Action: Executed regular expression stream scrubbing against 'logfile2.txt'.
+# Purpose: Enforced strict OpSec data compliance guidelines to generate 'logfile2_sanitized.txt' for public GitHub distribution.
+# Outcome: All raw 32-character authentication strings stripped and replaced with secure tokens.
+====================================
