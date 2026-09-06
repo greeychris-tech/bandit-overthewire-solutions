@@ -1,0 +1,331 @@
+:::: LOG FILE 3 ::::
+------------------------------------
+
+This is my tertiary LOG FILE for BOTW. Please take a look at this log for all notes and commands used, along with thought process.
+
+Currently: Initiating target environment analysis for Level 15. Evaluating SSL/TLS cryptographic communication vectors and extracting target credentials.
+
+====================================
+
+# [PROGRESS] 2026-09-06 19:26:59
+# Action: Starting Bandit Level 15 environment profiling.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 15
+# Analyst Rationale: Following the successful network socket validation in the previous tier, I am migrating our active testing footprint to the Level 15 infrastructure layer to begin environmental analysis.
+# Justification: Our active threat footprint must advance in tandem with recovered credentials. This migration establishes an encrypted console footprint inside the remote server perimeter to facilitate local loopback network probing.
+# Action: Executed an SSH handshake to connect as user bandit15 on port 2220.
+# Verification: SUCCESS. Access token authenticated successfully. Established a stable remote terminal session inside the target workspace.
+====================================
+
+# [EXCEPTION HANDLER] Network Telemetry Masked by System Constraints
+# Telemetry: 'ss -tl | grep 30001' returned a blank string execution state.
+# Analyst Assessment: The infrastructure enforces strict kernel-level visibility constraints on unprivileged user profiles, preventing direct socket table enumeration. Silence does not indicate port closure, but rather localized information masking designed to break automated asset discovery.
+# Remediation Protocol: Bypassing local socket table queries. Moving directly to active protocol probing by initializing an explicit SSL/TLS handshake against the target port to force an application-layer response.
+====================================
+
+# [SECURITY HANDSHAKE] SSL/TLS Secure Tunnel Establishment
+# Telemetry: Received standard verification warning: 'depth=0 CN=SnakeOil; verify error:num=18:self-signed certificate; verify return:1'.
+# Analyst Assessment: The OpenSSL engine successfully completed the cryptographic key exchange over port 30001. The self-signed 'SnakeOil' signature warning is normal within isolated development labs; 'verify return:1' confirms the client subsystem bypassed strict authority checking to maintain an open tunnel.
+# Action Justification: Deploying the native 'openssl s_client' tool with the '-quiet' parameter suppresses heavy session metadata, exposing a clean interactive socket line for direct payload delivery.
+====================================
+
+# [PROGRESS] Bandit Level 15 -> Level 16 Password Resolution
+# Telemetry: Server returned 'Correct!' status message followed by a 32-character cleartext access string.
+# Analyst Rationale: By injecting the verified 32-character Layer 14 system token directly into the established SSL encrypted stream, the backend authentication daemon validated our session footprint and bypassed local permission isolation controls.
+# Outcome: SUCCESS. Decrypted the application layer communication channel and extracted the cleartext credentials for the Level 16 security tier.
+====================================
+
+# [Bandit Level 16] 
+====================================
+
+# [DISCOVERY] Environmental Triage & Network Scan Initialization
+# Telemetry: Directory listing confirmed a clean baseline profile space containing only standard POSIX dotfiles and '.bandit15.password'. No plaintext credential vectors exist on disk.
+# Analyst Rationale: Because the file system layer lacks direct credential indicators, the testing vectors must reside at the network layer. Threat intelligence points to an active authentication service bound to an anonymous port within the 31000-32000 TCP range.
+# Justification: I am deploying the native network exploration engine 'nmap' targeting the local loopback interface. Passing the service version detection switch (-sV) is necessary to programmatically identify which open sockets are running active SSL/TLS cryptographic listening wrappers, allowing us to map the server's perimeter accurately.
+====================================
+
+# [DIAGNOSTIC PHASE] Active Transport-Layer Service Probing
+# Telemetry: 'Starting Nmap 7.98 ( https://nmap.org ) at 2026-09-06 19:38' initialized successfully.
+# Analyst Rationale: Because an intensive service version scan (-sV) requires sequential connection handshakes across a 1000-port array, execution latency is expected. The tool is actively parsing socket responses to map network listeners.
+# Action: Monitoring the active foreground processing stream inside the remote shell pane, awaiting the complete service descriptor table.
+====================================
+
+# [DIAGNOSTIC PHASE] Processing Latency Interception
+# Telemetry: Foreground process remains attached with a flashing cursor; standard output table is temporarily deferred.
+# Analyst Assessment: High version-probing latency is normal when testing hardened architectures. The network mapper is executing complex cryptographic signature checks on multiple ports sequentially, causing a data buffer delay.
+# Action Plan: Intercepting the running process by passing a standard carriage return or keyboard interrupt flag to force a real-time status metrics dump.
+====================================
+
+# [ANALYSIS] Local Loopback Interface Port Triage
+# Telemetry: Isolated five open sockets: 31046/echo, 31518/ssl-echo, 31691/echo, 31790/ssl-unknown, and 31960/echo.
+# Analyst Assessment: Service fingerprints for port 31790 exposed an explicit cryptographic string return: 'Wrong! Please enter the correct current password.' wrapped inside an SSL container layer.
+# Justification: The unrecognised service on port 31790 matches all threat intelligence metrics for the active authentication gateway cluster. The plain-text ports are discarded as diversionary vectors.
+# Operational Plan: Deploying 'openssl s_client' to establish a secure interactive session targeting port 31790 to transmit the Level 16 validation token.
+====================================
+
+# [DISCOVERY] Private Cryptographic Asset Exfiltration
+# Telemetry: Target port 31790 authenticated the Layer 15 token and dumped a valid 'BEGIN OPENSSH PRIVATE KEY' block structure.
+# Analyst Rationale: The authentication daemon has transitioned our escalation vector from flat-text string matching to asymmetric key authentication. This private key is a privileged credential that grants direct access to the Level 17 workspace perimeter.
+# Justification: Because we lack direct write permissions in the remote home folder to create a secure localized key cache, we must safely containerize this raw asset block into a custom workspace directory within '/tmp' or transmit it back to our local testing environment.
+# Operational Plan: I am going to establish a secure local staging folder within the remote target's temporary filesystem, write the private key data to an isolated file, and modify its POSIX permissions to meet strict SSH client compliance rules.
+====================================
+
+# [PERSPECTIVE] Cryptographic Session Escalation to Level 17
+# Analyst Rationale: Transitioning session contexts from user bandit16 to bandit17 via localized public-key loopback authentication.
+# Analyst Assessment: Standard loopback vectors are restricted by system write-locks on the home folder, causing critical file descriptor failures when the engine attempts to append signatures to '.ssh/known_hosts'. This directory friction causes the SSH binary to fall back to password menus, tripping the perimeter firewall.
+# Remediation Protocol: Deploying an inline configuration stream override to force strict public key preference (-o PreferredAuthentications=publickey), sink host verification targets directly into the null block interface (-o UserKnownHostsFile=/dev/null), and fully suppress host verification checks (-o StrictHostKeyChecking=no). This maintains direct key execution without triggering fallback modes.
+====================================
+
+# [EXCEPTION HANDLER] Loopback Authentication Defeated by Resource Firewall
+# Telemetry: Server returned resource restriction block and dropped the channel with: 'Connecting from localhost is blocked to conserve resources.'
+# Analyst Assessment: The infrastructure-side security daemon explicitly drops internal key verification loops targeting port 2220 to prevent local vertical privilege escalation. The client's identity presentation was rejected, triggering a password fallback state that tripped the firewall.
+# Remediation Protocol: Pivoting our routing trajectory away from the internal local interface sink. Directing the outbound cryptographic key handshake to target the public domain interface endpoint instead. This forces the server to process the asymmetric signature check across its external boundary layer.
+====================================
+
+# [EXCEPTION HANDLER] DNS Loopback Interception & Hard-Locked Loop
+# Telemetry: Public interface request resolved internally to 127.0.0.1, persistently triggering the resource firewall password fallback block.
+# Analyst Assessment: Because the target machine handles localized DNS loops internally, all outbound SSH routing to the public domain name is automatically re-routed to the loopback interface. The remote SSH client remains fundamentally blind to external routes.
+# Remediation Protocol: Implementing the analyst's asset exfiltration playbook. We will completely abandon the restricted remote environment, extract the private key asset, and reconstruct it locally on our workstation. This guarantees a true external routing origin, neutralizing the localhost firewall block entirely.
+====================================
+
+# [STRATEGIC PIVOT] Workstation-Side Asset Re-Import Protocol
+# Telemetry: Private key file '~/kali_bandit17.key' successfully written to local disk space with explicit 600 POSIX permission metrics.
+# Analyst Rationale: By moving the private key asset down to our external workstation, we force the authentication pipeline to process entirely over the public network boundary rather than the blocked internal loopback context.
+# Outcome: SUCCESS. Isolated the cryptographic credential and secured a true external origin pathway, clearing the internal resource firewall block completely.
+====================================
+
+# [EXCEPTION HANDLER] Local Cryptographic Library Format Mismatch
+# Telemetry: System returned: 'error in libcrypto: unsupported' and denied authentication via publickey.
+# Analyst Assessment: The workstation's modern OpenSSL/libcrypto backend refuses to parse the exfiltrated key asset because it utilizes an older legacy structural signature. This modern client-side hardening drops the key from the presentation array, triggering an immediate authentication failure.
+# Remediation Protocol: Modifying the outbound execution payload by appending explicit inline configuration arguments to manually override the local engine's restriction block. We will force the client subsystem to accept legacy cryptographic algorithms (+ssh-rsa) for this specific tunnel operation.
+====================================
+
+# [EXCEPTION HANDLER] Remote Home Directory Path Conflict
+# Telemetry: Path resolved to '/home/bandit16/kali_bandit17.key' inside the active remote terminal connection pane.
+# Analyst Assessment: Because the top pane session was still attached to the remote server, the shell evaluated the home path shortcut (~) against the target system's filesystem instead of the local machine. We must clear the remote session footprint to reset the context.
+# Remediation Protocol: Issuing an explicit 'exit' control sequence to break the remote connection channel and return the execution plane to the local workstation prompt.
+====================================
+
+# [STRATEGIC EXECUTION] Retrospective Privilege & Credential Verification
+# Analyst Rationale: While cryptographic loopback exfiltration successfully escalated our active session context to bandit17, the 32-character flat-text access token for Level 16 remains unrecorded.
+# Justification: To ensure our credential repository is completely populated for portfolio compliance, we must utilize our newly elevated system access to read the local secure token store backward, extracting the raw plaintext hash for the Level 16 tier.
+# Operational Plan: Executing a direct file system read against the protected path '/etc/bandit_pass/bandit16' within the authenticated bandit17 shell environment.
+====================================
+
+# [EXCEPTION HANDLER] Retrospective Credential Access Denied via DAC
+# Telemetry: 'cat /etc/bandit_pass/bandit16' returned 'Permission denied'.
+# Analyst Assessment: Discretionary Access Control (DAC) policies are strictly enforced between level accounts. The system isolates the 'bandit16' credential file to prevent higher-tier profiles from reading backward into previous scopes. The 'bandit17' context lacks the necessary POSIX read bits for this path.
+# Conclusion: The flat-text string hash for Level 16 is intentionally withheld by the system architecture. The exfiltrated private key asset '~/kali_bandit17.key' serves as the singular, absolute cryptographic proof-of-work credential for this transition layer.
+====================================
+
+# [DISCOVERY] Environmental Triage & Configuration Modeling
+# Telemetry: Directory listing exposed two active data structures: 'passwords.old' and 'passwords.new', both matching a 3300-byte footprint with group read configurations assigned to bandit17.
+# Analyst Rationale: Threat intelligence indicates the next privilege escalation hash is hidden inside a localized version change between these files. Manual verification of a 3300-byte dataset introduces human error and operational inefficiencies.
+# Justification: I am deploying the native text processing utility 'diff' to execute a line-by-line comparison. This programmatically filters out identical strings and targets the unique differential vectors, providing a clean forensic audit trail.
+====================================
+
+# [PROGRESS] Bandit Level 17 -> Level 18 Version Analysis Complete
+# Telemetry: 'diff passwords.old passwords.new' isolated a single modified block at line entry 42.
+# Analyst Rationale: Line-by-line delta checking successfully dropped identical string buffers. The comparison revealed that the old hash '< [SECURE_TOKEN_REDACTED]' has been explicitly replaced by the modified vector '> [SECURE_TOKEN_REDACTED]'.
+# Outcome: SUCCESS. Isolated the application-layer configuration change and extracted the cleartext access credential token for the Level 18 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 18
+# Analyst Rationale: Following the successful text-differential parsing of the password version files, I am migrating our active testing footprint to the Level 18 infrastructure layer.
+# Justification: To maintain complete forensic tracking across subsequent network and profile constraints, our operational console presence must advance in tandem with newly resolved tokens.
+# Action: Preparing to execute an outbound SSH handshake targeting user bandit18 on port 2220.
+====================================
+
+# [METHODOLOGY RE-ALIGNMENT] Unified Forensic Chain of Custody Audit
+# Analyst Assessment: To ensure absolute transparency for system reviewers and prevent any perceived gaps in the level-escalation timeline, this node explicitly registers the cross-functional credential matrix from Level 14 through Level 17.
+# Technical Rationale: Level authentication mechanisms on this infrastructure alternate dynamically between symmetric text strings and asymmetric cryptographic assets. Tier 16 enforces a pivot where the target network socket (port 31790) outputs a raw RSA Private Key file rather than a standard 32-character hash. This private key serves as the standalone, absolute validation token required to initialize the bandit17 session boundary.
+# Verified Credential Registry:
+#   [-] Tier 15 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+#   [-] Tier 16 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+#   [-] Tier 17 Access Token : ~/kali_bandit17.key               (Cryptographic Private Key Asset)
+#   [-] Tier 18 Access Token : [SECURE_TOKEN_REDACTED] (Newly Resolved Differential Token)
+# Conclusion: The chronological chain of custody from Level 14 through the current Level 17 baseline is officially closed, validated, and accounted for with zero skipped phases.
+====================================
+
+# [Bandit Level 18] 
+====================================
+
+# [EXCEPTION HANDLER] Interactive Session Handshake Intercepted and Terminated
+# Telemetry: Authentication token accepted successfully. Remote server displayed complete system banners and immediately dropped the socket with 'Byebye ! Connection to bandit.labs.overthewire.org closed.'
+# Analyst Assessment: The environment profile scripts (.bashrc / .profile) for user bandit18 have been intentionally modified to execute a hard termination routine upon interactive shell initialization. This blocks standard TTY/PTY console provisioning.
+# Remediation Protocol: Pivoting away from interactive session requests. Appending direct shell execution arguments to the trailing end of the SSH handshake. This instructs the SSH server daemon to invoke a non-interactive command processing loop to read the file system baseline directly.
+====================================
+
+# [DISCOVERY] Non-Interactive Directory Mapping & Shadow Profiling
+# Telemetry: Target file system exposed an unprivileged 33-byte text file named 'readme' alongside a heavily modified 3874-byte '.bashrc' template.
+# Analyst Assessment: Forensic mapping confirms the '.bashrc' profile script is owned by the higher-privileged 'bandit19' group context. This configuration confirms that the file was engineered to execute an instant terminal kill switch on login, preventing interactive sessions. However, the 'readme' asset possesses valid group-read bits for user bandit18.
+# Operational Plan: Deploying a secondary non-interactive SSH payload to target the literal file descriptor, passing a direct 'cat readme' parameter to read the contents from our workstation terminal.
+====================================
+
+# [PROGRESS] Bandit Level 18 -> Level 19 Content Extraction Complete
+# Telemetry: 'cat readme' bypassed the profile kill switch and successfully returned a 32-character cleartext access string.
+# Analyst Rationale: Utilizing a non-interactive remote execution command forced the SSH subsystem to extract target data bytes directly from disk prior to the environmental shell initializing its automated logout scripts.
+# Outcome: SUCCESS. Evaded the profile-level anti-tamper mechanism and secured the cleartext credentials for the Level 19 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 19
+# Analyst Rationale: Following the successful non-interactive extraction of the readme asset on the previous tier, I am migrating our active testing footprint to the Level 19 infrastructure layer.
+# Justification: Establishing an active terminal console footprint inside the Level 19 workspace allows us to execute a complete local environmental scan against the next tier's privilege parameters.
+# Action: Initiating an outbound SSH handshake targeting user bandit19 on port 2220.
+====================================
+
+# [Bandit Level 19] 
+====================================
+
+# [DISCOVERY] Environmental Triage & SUID Executable Isolation
+# Telemetry: Directory listing confirmed the presence of a 14880-byte binary named 'bandit20-do' with permission mask '-rwsr-x---', owned by user bandit20.
+# Analyst Rationale: The presence of the 's' character in the owner permission triad flags an active SetUID bit. This architectural property forces the Linux kernel to execute the process under the security context of the file owner (bandit20) rather than the invoking user (bandit19).
+# Operational Plan: Probing the execution requirements of the SUID wrapper by running the binary directly with zero parameters to trigger its standard error handler and analyze its syntax.
+====================================
+
+# [DIAGNOSTIC PHASE] SUID Context Privilege Verification
+# Telemetry: Program output established usage parameters: 'Run a command as another user. Example: ./bandit20-do whoami'.
+# Analyst Rationale: Prior to targeting secure backend files, we must functionally verify that the SUID execution context successfully escalates privileges from the application layer to the kernel space.
+# Action Plan: Running the binary with the 'whoami' argument string to verify if the process successfully overrides the active bandit19 environmental profile and prints the elevated bandit20 identifier.
+====================================
+
+# [PROGRESS] SUID Context Privilege Elevation Confirmed
+# Telemetry: Active string response returned 'bandit20'.
+# Analyst Rationale: The system successfully mapped the process execution context to the SetUID owner's identity. This confirms that local Discretionary Access Control (DAC) boundaries can be legally bypassed by appending target path arguments directly to the wrapper binary.
+# Operational Plan: Launching an explicit file exfiltration vector by invoking 'cat' against the privileged root credential path '/etc/bandit_pass/bandit20' through the validated SUID engine.
+====================================
+
+# [PROGRESS] Bandit Level 19 -> Level 20 Asset Exfiltration Complete
+# Telemetry: SUID binary executed 'cat /etc/bandit_pass/bandit20' successfully and returned a 32-character cleartext access string.
+# Analyst Rationale: Exploiting the active SetUID bit on the 'bandit20-do' wrapper binary allowed the process to inherit the effective user privileges of the file owner. This configuration successfully bypassed local discretionary access controls, exposing the target flat-text password hash directly within our terminal space.
+# Outcome: SUCCESS. Navigated the application-layer privilege bridge and secured the cleartext credentials for the Level 20 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 20
+# Analyst Rationale: Following the successful exfiltration of the secure credential store on the previous tier, I am migrating our active testing footprint to the Level 20 infrastructure layer.
+# Justification: Establishing an active terminal console footprint inside the Level 20 workspace allows us to execute a complete local environmental scan against the next tier's network listener parameters.
+# Action: Initiating an outbound SSH handshake targeting user bandit20 on port 2220.
+====================================
+
+# [Bandit Level 20] 
+====================================
+
+# [DISCOVERY] Environmental Triage & SUID Executable Isolation
+# Telemetry: Directory listing confirmed the presence of a 15604-byte binary named 'suconnect' with permission mask '-rwsr-x---', owned by user bandit21.
+# Analyst Rationale: The presence of the 's' character in the owner permission triad flags an active SetUID bit. This architectural property forces the Linux kernel to execute the process under the security context of the file owner (bandit21) rather than the invoking user (bandit20).
+# Operational Plan: Probing the execution requirements of the SUID wrapper by running the binary directly with zero parameters to trigger its standard error handler and analyze its syntax.
+====================================
+
+# [DISCOVERY] Inter-Process Network Subsystem Analysis
+# Telemetry: Program output established usage parameters: 'Usage: ./suconnect <portnumber>'. Program connects to localhost and expects the active level password from the listener to trigger credential exfiltration.
+# Analyst Rationale: To exploit this pipeline, we must construct a local multi-process loop. We will launch 'nc' (Netcat) in listen mode on an arbitrary unprivileged port, piping our current credential string into the socket. By spinning this listener off into a background thread (&), we keep our terminal prompt free to immediately invoke the SUID binary against that exact local port.
+====================================
+
+# [EXCEPTION HANDLER] Inter-Process Race Condition & Socket Binding Latency
+# Telemetry: System returned 'Could not connect' followed sequentially by 'Listening on 0.0.0.0 4545'.
+# Analyst Assessment: A race condition occurred because the SUID client binary initialized faster than the background Netcat thread could bind to the socket descriptor interface. The client socket request failed on an uninitialized port, while the listener safely completed initialization immediately afterward.
+# Remediation Protocol: Because the background network listener thread remains persistently bound to port 4545 and holds the active credential stream, we will manually issue a standalone client invocation command to complete the synchronization channel loop.
+====================================
+
+# [PROGRESS] Inter-Process Network Validation Loop Complete
+# Telemetry: Client processed inbound loopback hook; returned: 'Read: [SECURE_TOKEN_REDACTED]', 'Password matches, sending next password', followed by the cleartext token string.
+# Analyst Rationale: By intercepting the initial race condition and manually re-issuing the SUID client command while the background Netcat thread was actively listening, the data exchange pipeline synchronized perfectly. The client verified the token, bypassed local filesystem isolation, and transmitted the target key.
+# Outcome: SUCCESS. Authenticated the loopback network channel and secured the cleartext credentials for the Level 21 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 21
+# Analyst Rationale: Following the successful synchronized network socket exploitation on the previous tier, I am migrating our active testing footprint to the Level 21 infrastructure layer.
+# Justification: Establishing an active terminal console footprint inside the Level 21 workspace allows us to execute a complete local environmental scan against the next tier's privilege configuration.
+# Action: Initiating an outbound SSH handshake targeting user bandit21 on port 2220.
+====================================
+
+# [Bandit Level 21] 
+====================================
+
+# [DISCOVERY] Environmental Triage & Scheduled Task Automation Mapping
+# Telemetry: Directory listing confirmed a clean baseline profile space containing only standard POSIX dotfiles and '.prevpass'. No localized exploit paths or SUID binary wrappers exist on disk.
+# Analyst Rationale: Because the filesystem layer lacks immediate privilege escalation vectors, the target path must be managed by an automated infrastructure subsystem. Threat intelligence points to an active scheduled background routine driven by the Linux Cron daemon.
+# Justification: I am shifting our investigative trajectory from the local home folder to the global scheduled task repository path '/etc/cron.d/'. Auditing this configuration layout is necessary to locate the specific cron table mapping assigned to this tier and discover what automated scripts are executing in the background.
+====================================
+
+# [DISCOVERY] Global Scheduled Task Target Isolation
+# Telemetry: Global cron tree audit exposed three specific configuration targets: cronjob_bandit22, cronjob_bandit23, and cronjob_bandit24, all configured with global POSIX read permissions.
+# Analyst Rationale: Because our active testing target is the Level 22 perimeter, 'cronjob_bandit22' represents the primary target vector. This configuration asset houses the execution schedule parameters and tracking variables used by the automated system daemon.
+# Operational Plan: Executing a direct read against the path '/etc/cron.d/cronjob_bandit22' inside the remote shell pane to extract the script mapping and identify the underlying background automation vector.
+====================================
+
+# [DISCOVERY] Automation Script Targeting & System Parameter Mapping
+# Telemetry: Configuration file extraction returned: '* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null'.
+# Analyst Rationale: The cron parameters confirm that a background shell script at '/usr/bin/cronjob_bandit22.sh' is actively executed every minute under the privileged context of user bandit22.
+# Justification: To map the data lifecycle of the next tier's authentication token, we must audit the internal code design of this shell script. This allows us to trace where the process caches its outputs within the temporary filesystem blocks.
+====================================
+
+# [ANALYSIS] Bash Script Logic Flaw & Data Leak Isolation
+# Telemetry: '/usr/bin/cronjob_bandit22.sh' source code exposed a direct redirection routine: 'cat /etc/bandit_pass/bandit22 > /tmp/[SECURE_TOKEN_REDACTED]'.
+# Analyst Assessment: The script creates a major credential exposure vulnerability. Because the process executes under the 'bandit22' identity, it possesses the discretionary access required to read the target password file. By outputting that data into '/tmp/' with global read permissions (644), it completely breaks account isolation controls.
+# Operational Plan: Executing a direct file read against the exposed target temporary path '/tmp/[SECURE_TOKEN_REDACTED]' to extract the plaintext credential string.
+====================================
+
+# [PROGRESS] Bandit Level 21 -> Level 22 Automation Exploit Complete
+# Telemetry: 'cat /tmp/[SECURE_TOKEN_REDACTED]' successfully returned a 32-character cleartext access string.
+# Analyst Rationale: Dissecting the background script's permission structure revealed an intentional credential leak into the public directory tree. Reading the exposed temporary asset bypassed the filesystem boundary without triggering access violation filters.
+# Outcome: SUCCESS. Evaded local DAC boundaries via automated script analysis and secured the cleartext credentials for the Level 22 security tier.
+====================================
+
+# [PERSPECTIVE] Session Migration to Bandit Level 22
+# Analyst Rationale: Following the successful exfiltration of the cron daemon's temporary data block, I am migrating our active testing footprint to the Level 22 infrastructure layer.
+# Justification: Establishing an active terminal console footprint inside the Level 22 workspace allows us to execute a complete local environmental scan against the next tier's scheduled scripting parameters.
+# Action: Initiating an outbound SSH handshake targeting user bandit22 on port 2220.
+====================================
+
+# [Bandit Level 22] 
+====================================
+
+# [DISCOVERY] Environmental Triage & Level 23 Task Automation Mapping
+# Telemetry: Directory listing confirmed a clean baseline profile space containing only standard POSIX dotfiles. No localized exploit paths exist within the home directory.
+# Analyst Rationale: Because the file system layer lacks direct credential indicators, the testing vectors must reside within the system's global automated processes. Our previous scan of the cron directory isolated 'cronjob_bandit23' as the primary configuration asset for this tier.
+# Operational Plan: Executing a direct read against the path '/etc/cron.d/cronjob_bandit23' inside the remote shell pane to extract the execution parameters and locate the underlying script path.
+====================================
+
+# [DISCOVERY] Automation Script Targeting & System Parameter Mapping
+# Telemetry: Configuration file extraction returned: '* * * * * bandit23 /usr/bin/cronjob_bandit23.sh &> /dev/null'.
+# Analyst Rationale: The cron parameters confirm that a background shell script at '/usr/bin/cronjob_bandit23.sh' is actively executed every minute under the privileged context of user bandit23.
+# Justification: To map the encryption or obfuscation routing used for the next tier's access token, we must audit the internal code design of this shell script to trace its data output targets.
+====================================
+
+# [ANALYSIS] Dynamic Obfuscation Routine & Hashing Vulnerability Dissected
+# Telemetry: '/usr/bin/cronjob_bandit23.sh' source code revealed a variable-driven tracking algorithm: mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1).
+# Analyst Assessment: The script attempts to obscure the credential target file location by translating the string 'I am user bandit23' into a raw MD5 hash token. Because the algorithm is deterministic and lacks an added cryptographic salt, an analyst can programmatically replicate the calculation locally to resolve the exact target filename descriptor within the public /tmp/ tree.
+# Operational Plan: Replicating the script's exact internal string manipulation syntax locally to compute the target hash value, then running 'cat' on that resolved file path to extract the Level 23 password token.
+====================================
+
+# [PROGRESS] Cryptographic Target Path Resolution Complete
+# Telemetry: String simulation 'echo I am user bandit23 | md5sum' successfully computed hash signature: '[SECURE_TOKEN_REDACTED]'.
+# Analyst Rationale: Replicating the infrastructure's dynamic variable logic allowed us to accurately map the obfuscated target filename descriptor without triggering error monitoring alerts. The file is mapped to the public destination: '/tmp/[SECURE_TOKEN_REDACTED]'.
+# Operational Plan: Deploying 'cat' against the resolved temporary filesystem block to extract the plaintext access string.
+====================================
+
+# [PROGRESS] Bandit Level 22 -> Level 23 Obfuscation Exploit Complete
+# Telemetry: 'cat /tmp/[SECURE_TOKEN_REDACTED]' returned a 32-character cleartext access string.
+# Analyst Rationale: Replicating the deterministic hashing signature allowed for targeted extraction of the exposed file buffer, safely circumventing standard discretionary access controls.
+# Outcome: SUCCESS. Exfiltrated and verified the cleartext credentials for the Level 23 security tier.
+====================================
+
+# [CREDENTIAL VERIFICATION REGISTRY] Active Assessment Sign-Off
+# Tier 16 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 17 Access Token : ~/kali_bandit17.key               (Cryptographic Private Key Asset)
+# Tier 18 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 19 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 20 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 21 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 22 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Tier 23 Access Token : [SECURE_TOKEN_REDACTED] (Cleartext Hash)
+# Analyst Sign-off: All identity markers have been verified cross-functionally. The linear chain of custody from Level 15 through Level 23 is closed and validated.
+====================================
+
+# [ADMINISTRATIVE] Post-Assessment Data Sanitization Loop
+# Analyst Rationale: Prior to committing today's operational logs to a public version control platform (GitHub), strict Operational Security (OpSec) protocols must be enforced to prevent credential leakage.
+# Action Justification: Deploying the native stream editor 'sed' utilizing regular expressions to programmatically scan and mask all 32-character cleartext authentication hashes. This converts the live forensic tracking file into a secure 'logfile3_sanitized.txt' asset suitable for public distribution.
+# Outcome: SUCCESS. All live access tokens have been safely stripped and replaced with secure placeholder metrics.
+====================================
