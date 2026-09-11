@@ -1,0 +1,353 @@
+
+:::: LOG FILE 5 ::::
+------------------------------------
+This is my primary LOG FILE for BOTW. Please take a look at this log for all notes and commands used, along with thought process.
+Session Initiated: 2026-09-11 00:19:59 EDT
+Currently: Target Scope Bandit Level 27 -> Level 28 Challenge Exploration
+====================================
+# Telemetry: Active Target Context: bandit27
+# Analyst Rationale: Initiating local file-system enumeration within the new user space to locate challenge binaries, repositories, or workspace profiles.
+# Action/Plan: ls -la
+====================================
+
+# [DISCOVERY] Resuming Operations: Home Directory File-System Enumeration
+# Telemetry: Logfile4 sanitization complete. Active shell session attached to bandit27 context.
+# Analyst Rationale: Scanning the active home workspace directory to isolate unique challenge deployment structures, configurations, or application repositories.
+# Action/Plan: ls -la
+====================================
+
+# [Bandit Level 27] 
+====================================
+
+# [DISCOVERY] Home Directory Sterile State Analysis
+# Telemetry: ls -la returned standard shell configuration profiles only (.bashrc, .profile).
+# Analyst Rationale: No localized application files discovered. Shifting reconnaissance to the internal network stack to identify listening service sockets.
+# Action/Plan: ss -tlpn
+====================================
+
+# [DISCOVERY] Git Repository Target Identification
+# Telemetry: ss -tlpn returned empty or restricted interface rows.
+# Analyst Rationale: Standard network query features restricted. Utilizing out-of-band challenge data isolating an active internal Git instance at port 2220. Instantiating a writable scratch area in /tmp to extract the repository files.
+# Action/Plan: Initialize staging path, move to path, and execute git clone ssh://bandit27-git@localhost:2220/home/bandit27-git/repo
+====================================
+
+# [EXCEPTION] SSH Loopback Firewall Restriction Blocks Git Clone
+# Telemetry: Connection rejected by loopback policy; fatal: Could not read from remote repository.
+# Analyst Rationale: The Git utility attempted an internal SSH connection over loopback port 2220, which is blocked by the platform's infrastructure rules. Pivoting to inspect local filesystem permissions on the repository path to execute a local file-based clone.
+# Action/Plan: ls -la /home/bandit27-git/repo
+====================================
+
+# [EXCEPTION] Local Filesystem Access Denied on Repository Path
+# Telemetry: ls: cannot open file '/home/bandit27-git/repo': Permission denied
+# Analyst Rationale: Internal local paths are locked down by DAC rules, and loopback traffic on 2220 is firewalled from the inside. Pivoting to initiate an external network transaction from the local client machine directly to the public gateway over port 2220.
+# Action/Plan: Run git clone directly from the local machine shell targeting the public server infrastructure.
+====================================
+
+# [SUCCESS] External Network Git Repository Exfiltration
+# Telemetry: remote: Enumerating objects: 3, done. Receiving objects: 100% (3/3), done.
+# Analyst Rationale: Successfully bypassed the internal loopback connection block by authenticating directly to the public gateway from the local VM. Commencing file structure exploration on the extracted code assets.
+# Action/Plan: cd repo && ls -la
+====================================
+
+# [DISCOVERY] Git Repository Payload Asset Isolated
+# Telemetry: Identified README configuration file within the master branch checkout tier.
+# Analyst Rationale: Exfiltrating the text payload of the localized README file to scan for cleartext credential leaks or hidden level migration vectors.
+# Action/Plan: cat README
+====================================
+
+# [SUCCESS] Version Control Repository Password Exfiltration
+# Telemetry: cat README returned 'The password to the next level is: [REDACTED_L28_PASSWORD]'
+# Analyst Rationale: Bypassed loopback communication filters by cloning the git service externally over the public interface. Extracted cleartext credential leaks from the base commit branch README file.
+# Action/Plan: Log confirmed Level 28 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 28
+# Telemetry: Remote environment accepted credential token [REDACTED_L28_PASSWORD]
+# Analyst Rationale: Documenting the completion of the Level 27 Git repository extraction phase and certifying structural progression across the level boundary.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 28 -> Level 29.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 28 -> Level 29
+# Telemetry: Active Target Context: bandit28
+# Analyst Rationale: Commencing file-system enumeration within the Level 28 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: ls -la
+====================================
+
+# [Bandit Level 28] 
+====================================
+
+# [DISCOVERY] Home Directory Sterile State Analysis
+# Telemetry: ls -la returned standard shell configuration profiles only (.bashrc, .profile).
+# Analyst Rationale: No localized challenge assets discovered. Shifting operations to investigate the presence of a dedicated Level 28 Git service repository over the public gateway.
+# Action/Plan: Establish local workspace and run git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo
+====================================
+
+# [SUCCESS] Remote Repository Replication Complete
+# Telemetry: Git clone execution finished with a silent completion status.
+# Analyst Rationale: Confirming repository download. Moving into the master branch directory to inspect tracking files and discover configuration text maps.
+# Action/Plan: cd repo && ls -la
+====================================
+
+# [DISCOVERY] Git Repository Payload Asset Isolated
+# Telemetry: Identified README.md configuration file within the master branch checkout tier.
+# Analyst Rationale: Exfiltrating the text payload of the localized README.md file to scan for cleartext credential leaks or hidden level migration vectors.
+# Action/Plan: cat README.md
+====================================
+
+# [EXCEPTION] Data Masking Encountered on Active Branch Layer
+# Telemetry: README.md content field reflects a masked credential row: 'password: xxxxxxxxxx'.
+# Analyst Rationale: Active head branch snapshot contains redacted records. Exploiting Git immutable historical ledger mechanisms to audit code modifications and recover the unmasked token.
+# Action/Plan: git log -p README.md
+====================================
+
+# [DISCOVERY] Information Leak Mitigation Commit Isolated
+# Telemetry: Isolated commit 83d77407b76c9f86ac4e691a47618641c9d527ba explicitly titled 'fix info leak'.
+# Analyst Rationale: Navigating the active git log viewer to read the text differences and intercept the deleted cleartext credential line.
+# Action/Plan: Advance pager navigation in local terminal.
+====================================
+
+# [SUCCESS] Git Historical Diff Interception
+# Telemetry: Diff log exfiltrated original token line: - password: [REDACTED_L29_PASSWORD]
+# Analyst Rationale: Leveraged Git version control immutability properties to analyze the 'fix info leak' patch file modification, intercepting the original cleartext credential before redacting placeholders were applied.
+# Action/Plan: Log confirmed Level 29 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 29
+# Telemetry: Remote environment accepted credential token [REDACTED_L29_LOG_PRESERVATION]
+# Analyst Rationale: Documenting the completion of the Level 28 historical git diff extraction phase and certifying structural progression across the level boundary.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 29 -> Level 30.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 29 -> Level 30
+# Telemetry: Active Target Context: bandit29
+# Analyst Rationale: Commencing file-system enumeration within the Level 29 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: ls -la
+====================================
+
+# [Bandit Level 29] 
+====================================
+
+# [DISCOVERY] Home Directory Sterile State Analysis
+# Telemetry: ls -la returned standard shell configuration profiles only (.bashrc, .profile).
+# Analyst Rationale: No localized challenge assets discovered. Shifting operations to investigate the presence of a dedicated Level 29 Git service repository over the public gateway.
+# Action/Plan: Establish local workspace and run git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo
+====================================
+
+# [SUCCESS] Remote Repository Replication Complete
+# Telemetry: Git clone execution finished with a silent completion status.
+# Analyst Rationale: Confirming repository download. Moving into the master branch directory to inspect tracking files and discover configuration text maps.
+# Action/Plan: cd repo && ls -la
+====================================
+
+# [DISCOVERY] Git Repository Payload Asset Isolated
+# Telemetry: Identified README.md configuration file within the master branch checkout tier.
+# Analyst Rationale: Exfiltrating the text payload of the localized README.md file to establish an operational baseline for credential presence.
+# Action/Plan: cat README.md
+====================================
+
+# [EXCEPTION] Production Data Masking Enforced on Master Branch
+# Telemetry: README.md content field reflects a production placeholder: '<no passwords in production> [ 
+> **Telemetry & Syntax Optimization:** Terminal execution workflows utilize optimized  formatting with standardized system status indicators ( and ). This telemetry method separates inline contextual analysis from functional commands, establishing an enterprise-ready audit trail directly within the capture log.
+'.
+# Analyst Rationale: Active master commit contains redacted information. Auditing the historical git log differences to verify if the raw password exists in a prior revision block.
+# Action/Plan: git log -p README.md
+====================================
+
+# [DISCOVERY] Username Modification Commit Isolated
+# Telemetry: Isolated commit a9c5d1c2b43890809f3077bb9ec65c30ced242fb titled 'fix username'.
+# Analyst Rationale: Navigating through the git log pager to inspect the text differences and verify if prior file revisions contain cleartext data leaks.
+# Action/Plan: Advance pager navigation in local terminal.
+====================================
+
+# [DISCOVERY] Username Modification Commit Isolated
+# Telemetry: Isolated commit a9c5d1c2b43890809f3077bb9ec65c30ced242fb titled 'fix username'.
+# Analyst Rationale: Navigating through the git log pager to inspect the text differences and verify if prior file revisions contain cleartext data leaks.
+# Action/Plan: Advance pager navigation in local terminal.
+====================================
+
+# [DISCOVERY] Prior Historical Commit Vector Isolated
+# Telemetry: Isolated unique parent commit b548c69e5c7db36002cf8382ad49b4b3f883da71 authored by Ben Dover.
+# Analyst Rationale: Running a direct git show interrogation against the isolated commit hash block to bypass general log filters and expose historical file differences.
+# Action/Plan: git show b548c69e5c7db36002cf8382ad49b4b3f883da71
+====================================
+
+# [DISCOVERY] Master Branch History Exhausted; Shifting Vectors
+# Telemetry: Initial commit reflects production placeholder text strictly.
+# Analyst Rationale: Verified the token was never stored on the master branch timeline. Pivoting to scan for hidden development branches or localized Git tags to locate the credential data.
+# Action/Plan: git branch -a && git tag
+====================================
+
+# [DISCOVERY] Secondary Remote Development Branches Isolated
+# Telemetry: Found remotes/origin/dev and remotes/origin/sploits-dev indices.
+# Analyst Rationale: Master branch lacks credentials but alternate development tracking branches are active. Initiating a direct history audit against origin/dev to screen for unmasked token strings.
+# Action/Plan: git log -p origin/dev
+====================================
+
+# [SUCCESS] Remote Branch History Extraction Complete
+# Telemetry: Diff log exfiltrated active target line: + password: [REDACTED_L30_PASSWORD]
+# Analyst Rationale: Successfully isolated hidden developer credentials by pivoting from the sanitized master line to investigate the origin/dev historical tracking layers.
+# Action/Plan: Log confirmed Level 30 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 30
+# Telemetry: Remote environment accepted credential token [REDACTED_L30_PASSWORD]
+# Analyst Rationale: Documenting the completion of the Level 29 remote development branch extraction phase and certifying structural progression across the level boundary.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 30 -> Level 31.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 30 -> Level 31
+# Telemetry: Active Target Context: bandit30
+# Analyst Rationale: Commencing file-system enumeration within the Level 30 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: ls -la
+====================================
+====================================
+
+# [Bandit Level 30] 
+====================================
+
+# [DISCOVERY] Home Directory Sterile State Analysis
+# Telemetry: ls -la returned standard shell configuration profiles only (.bashrc, .profile).
+# Analyst Rationale: No localized challenge assets discovered. Shifting operations to investigate the presence of a dedicated Level 30 Git service repository over the public gateway.
+# Action/Plan: Establish local workspace and run git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo
+====================================
+
+# [SUCCESS] Remote Repository Replication Complete
+# Telemetry: Git clone execution finished with a silent completion status.
+# Analyst Rationale: Confirming repository download. Moving into the master branch directory to inspect tracking files and discover configuration text maps.
+# Action/Plan: cd repo && ls -la
+====================================
+
+# [DISCOVERY] Git Repository Payload Asset Isolated
+# Telemetry: Identified README.md configuration file within the master branch checkout tier.
+# Analyst Rationale: Exfiltrating the text payload of the localized README.md file to establish an operational baseline for credential presence.
+# Action/Plan: cat README.md
+====================================
+
+# [EXCEPTION] Sterile Master Branch File State Encountered
+# Telemetry: README.md content returns text string: 'just an epmty file... muahaha'
+# Analyst Rationale: Documenting the false indicator flag. Shifting to an exhaustive version control audit across commit logs, remote branches, and repository tags to locate the token repository layout.
+# Action/Plan: git log -p README.md && git branch -a && git tag
+====================================
+
+# [DISCOVERY] Master History Ledger Exhausted; Terminating Pager View
+# Telemetry: Git log history terminates on initial sterile file creation snapshot.
+# Analyst Rationale: Halting the active log pager session to allow the shell process to advance and render the subsequent branch and tag index tables.
+# Action/Plan: Send keystroke 'q' to terminate git log pager stream.
+====================================
+
+# [DISCOVERY] Cryptographic Release Tag Isolated
+# Telemetry: Git index scan isolated an active repository tag identifier named 'secret'.
+# Analyst Rationale: Branch indices are fully sanitized. Exploiting the isolated 'secret' tag metadata wrapper to bypass standard branch views and extract hidden raw text payloads.
+# Action/Plan: git show secret
+====================================
+
+# [PROGRESS] Cryptographic Tag Database Object Extracted
+# Telemetry: git show secret completed execution without syntax exceptions.
+# Analyst Rationale: Capturing the text payload from the isolated release tag stream to isolate cleartext credential signatures.
+# Action/Plan: Intercept and document the raw token data displayed in the terminal.
+====================================
+
+# [SUCCESS] Cryptographic Tag Content Exfiltration
+# Telemetry: git show secret returned [REDACTED_L31_PASSWORD]
+# Analyst Rationale: Successfully bypassed the empty master branch file layer by directly interrogating the hidden repository tag object 'secret' to capture the unmasked credential.
+# Action/Plan: Log confirmed Level 31 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 31
+# Telemetry: Remote environment accepted credential token [REDACTED_L31_PASSWORD]
+# Analyst Rationale: Documenting the completion of the Level 30 cryptographic tag extraction phase and certifying structural progression across the level boundary.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 31 -> Level 32.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 31 -> Level 32
+# Telemetry: Active Target Context: bandit31
+# Analyst Rationale: Commencing file-system enumeration within the Level 31 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: ls -la
+====================================
+
+# [Bandit Level 31] 
+====================================
+
+# [DISCOVERY] Git Configuration File Isolated
+# Telemetry: ls -la returned standard profiles alongside a local .gitconfig configuration file.
+# Analyst Rationale: Local configuration vectors are active. Shifting operations to replicate the corresponding Level 31 Git repository over the public network interface to bypass loopback blocks.
+# Action/Plan: Establish local workspace and run git clone ssh://bandit31-git@bandit.labs.overthewire.org:2220/home/bandit31-git/repo
+====================================
+
+# [SUCCESS] Remote Repository Replication Complete
+# Telemetry: Git clone execution finished with a silent completion status.
+# Analyst Rationale: Confirming repository download. Moving into the master branch directory to inspect tracking files and discover configuration text maps.
+# Action/Plan: cd repo && ls -la
+====================================
+
+# [DISCOVERY] Git Repository Payload Asset Isolated
+# Telemetry: Identified README.md and .gitignore files within the master branch checkout tier.
+# Analyst Rationale: Exfiltrating the text payload of the localized README.md file to establish an operational baseline and extract challenge specifications.
+# Action/Plan: cat README.md
+====================================
+
+# [DISCOVERY] Active Repository Modification Specifications Isolated
+# Telemetry: README.md requires pushing key.txt containing 'May I come in?' to the remote master branch.
+# Analyst Rationale: Analyzing local environment constraints. Inspecting the .gitignore file to identify and neutralize any tracking filters that might block key.txt from being committed.
+# Action/Plan: cat .gitignore
+====================================
+
+# [EXCEPTION] Git Exclusion Rule Restricts Standard Staging
+# Telemetry: .gitignore reflects global exclusion tracking rule: '*.txt'.
+# Analyst Rationale: Overriding the workspace file filter constraint by utilizing the explicit force flag parameter within the git staging application to track the required asset.
+# Action/Plan: echo "May I come in?" > key.txt && git add -f key.txt && git status
+====================================
+
+# [PROGRESS] Forced Staging Confirmed; Commencing Push Phase
+# Telemetry: git status reflects staged asset: new file: key.txt
+# Analyst Rationale: Finalizing local repository changes and executing a push instruction to trigger server-side automated Git verification hooks.
+# Action/Plan: git commit -m "Deploy key.txt for authentication" && git push origin master
+====================================
+
+# [EXCEPTION] Git Author Identity Missing on Local Host
+# Telemetry: Author identity unknown; fatal: unable to auto-detect email address.
+# Analyst Rationale: Local host environment lacks initialized Git committer metadata. Restricting configuration profiles locally to the current repository directory to bypass global state requirements.
+# Action/Plan: git config user.email "bandit31@overthewire.org" && git config user.name "bandit31" && git commit -m "Deploy key.txt" && git push origin master
+====================================
+
+# [SUCCESS] Remote Repository Git Hook Flag Interception
+# Telemetry: Well done! Here is the password for the next level: [REDACTED_L32_PASSWORD]
+# Analyst Rationale: Successfully bypassed local .gitignore configuration restrictions using the forced staging override bit and executed a push operation to trigger the automated server-side verification hooks.
+# Action/Plan: Log confirmed Level 32 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 32
+# Telemetry: Remote login gateway accepted credential token [REDACTED_L32_PASSWORD]
+# Analyst Rationale: Documenting full ownership of Level 32. Commencing analysis on the active restricted shell profile environment.
+# Action/Plan: Initialize tracking entries for Target Scope Bandit Level 32 -> Level 33.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 32 -> Level 33
+# Telemetry: Active Target Context: bandit32 (Trapped within WELCOME TO THE UPPERCASE SHELL)
+# Analyst Rationale: Testing input parsing vectors against the application loop. Attempting a process parameter injection (/usr/bin/zsh) to trigger an environmental breakout sequence.
+# Action/Plan: Pass $0 to the shell prompt
+====================================
+
+# [Bandit Level 32] 
+====================================
+
+# [SUCCESS] Restricted Shell Loop Escape Accomplished
+# Telemetry: Restricted prompt '>>' replaced by unconstrained interpreter state symbol '$'.
+# Analyst Rationale: Variable macro expansion (/usr/bin/zsh) successfully forced the system to initialize a native execution context, dropping out of the string manipulation loop. Moving to extract the next level's cleartext token.
+# Action/Plan: cat /etc/bandit_pass/bandit33
+====================================
+
+# [SUCCESS] Level 33 Cleartext Password Exfiltration
+# Telemetry: cat /etc/bandit_pass/bandit33 returned [REDACTED_L33_PASSWORD]
+# Analyst Rationale: Recovered the static alphanumeric password token for the next tier. This bridges our environment breakout tracking, establishing verifiable proof of full level ownership.
+====================================
+
+:::: SESSION CLOSURE SUMMARY ::::
+------------------------------------
+All targeted scopes for this testing window have been successfully explored, resolved, and audited.
+Session Concluded: 2026-09-11 01:20:39 EDT
+Final State: Target Scope Bandit Level 32 -> Level 33 COMPLETED.
+====================================
+
+# [Bandit Level 33
+====================================

@@ -1,0 +1,265 @@
+
+:::: LOG FILE 4 ::::
+------------------------------------
+This is my primary LOG FILE for BOTW. Please take a look at this log for all notes and commands used, along with thought process.
+Session Initiated: 2026-09-10 23:05:36 EDT
+Currently: Target Scope Bandit Level 23 -> Level 24 Privilege Escalation
+====================================
+
+# [Bandit Level 23] 
+
+====================================
+
+# [DISCOVERY] System Scheduler Directory Reconnaissance
+# Telemetry: Pending remote directory listing output from /etc/cron.d/
+# Analyst Rationale: Isolating the specific scheduled cron configuration tracking string to locate privilege escalation vectors.
+# Action/Plan: ls -la /etc/cron.d/
+====================================
+
+# [DISCOVERY] Cron Configuration Isolation
+# Telemetry: Found cronjob_bandit24 configuration file with global read access permissions.
+# Analyst Rationale: Exfiltrating the cron configuration parameters to identify the targeted script payload or execution binary path.
+# Action/Plan: cat /etc/cron.d/cronjob_bandit24
+====================================
+
+# [DISCOVERY] Automation Script Target Identified
+# Telemetry: @reboot bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null and * * * * * bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null
+# Analyst Rationale: Analyzing the shell script source code to map out execution branches, directory manipulation loops, or privilege escalation opportunities.
+# Action/Plan: cat /usr/bin/cronjob_bandit24.sh
+====================================
+
+# [DISCOVERY] Automation Script Logic Reverse-Engineering
+# Telemetry: Identified execution loop matching owner 'bandit23' with mandatory file execution and subsequent deletion cleanup blocks.
+# Analyst Rationale: Testing DAC directory traversal privileges against /var/spool/bandit24/foo to confirm injection capability.
+# Action/Plan: ls -la /var/spool/bandit24/foo
+====================================
+
+# [EXCEPTION] DAC Permission Restriction and Syntax Error
+# Telemetry: ls: cannot open directory '/var/spool/bandit24/foo': Permission denied via nested trail /foo/foo
+# Analyst Rationale: Documenting permission failure. While directory read access is restricted, directory write and execution flags may still permit blind file creation.
+# Action/Plan: Log exception and establish a local staging directory in /tmp to compile the exploitation payload.
+====================================
+
+# [EXCEPTION] Shell Expansion Failure during Directory Traversal
+# Telemetry: -bash: cd: /tmp/bandit23_stage_*: No such file or directory
+# Analyst Rationale: Wildcard expansion failed because the token was evaluated before the filesystem write completed. Remediating by utilizing an explicit shell environment variable.
+# Action/Plan: Export explicit STAGE_DIR variable, execute mkdir, and perform direct directory traversal.
+====================================
+
+# [PROGRESS] Staging Workspace Established
+# Telemetry: Target path verified via pwd: /tmp/stage_b23_1789089537
+# Analyst Rationale: Constructing an automated weaponized shell script payload designed to read the target level credential and output it to our controlled staging path.
+# Action/Plan: Create exploit.sh payload within the verified staging directory.
+====================================
+
+# [PROGRESS] Exploit Payload Structural Configuration
+# Telemetry: exploit.sh successfully written to storage layer.
+# Analyst Rationale: Modifying discretionary access controls to assign explicit execute privileges, preventing execution blocks when evaluated by the cron thread.
+# Action/Plan: chmod 755 exploit.sh
+====================================
+
+# [DEPLOYMENT] Exploit Payload Injection and Monitoring
+# Telemetry: exploit.sh permission flags verified; permissions updated to executable.
+# Analyst Rationale: Copying the weaponized payload to the blind spool directory with metadata preservation. Initiating a tracking loop to intercept the exfiltrated credential token.
+# Action/Plan: cp -p exploit.sh /var/spool/bandit24/foo/ && while [ ! -f password.txt ]; do echo 'Awaiting token exfiltration...'; sleep 2; done; cat password.txt
+====================================
+
+# [EXCEPTION] Token Exfiltration Timeout and Execution Loop
+# Telemetry: Monitoring loop exceeding 60-second cron boundary without password.txt generation.
+# Analyst Rationale: Payload execution failed or file copy was rejected. Initiating directory write capability check to isolate permissions from execution failures.
+# Action/Plan: Keep Top Window active; execute touch test against spool directory to verify write permissions.
+====================================
+
+# [PROGRESS] Directory Write Verification and Injection Adjustment
+# Telemetry: Write Access Verified against /var/spool/bandit24/foo/
+# Analyst Rationale: Confirming file creation is functional. Shifting from 'cp' deployment to a direct file creation vector with explicit global permission modifications to prevent permission stripping.
+# Action/Plan: Direct creation of exploit script inside the target spool directory, followed by absolute permissions modification.
+====================================
+
+# [EXCEPTION] Persistent Execution Loop and Sandbox Isolation
+# Telemetry: Direct file creation inside spool folder failed to generate password.txt within /tmp.
+# Analyst Rationale: Analyzing sandbox restrictions. File-based exfiltration to /tmp may be blocked by system-level mandatory access control (MAC). Pivoting to a local loopback network socket exfiltration strategy.
+# Action/Plan: Initialize a background netcat listener on port 44444 and inject a network-piped payload script.
+====================================
+
+# [SUCCESS] Privilege Escalation via Network Socket Exfiltration
+# Telemetry: [1]+ Done nc -l -p 44444 > password.txt | Credential Intercepted: [REDACTED_L24_PASSWORD]
+# Analyst Rationale: Bypassed local file-system sandboxing restrictions by pivoting to an inter-process network socket pipeline. The cron daemon successfully executed the script as bandit24, transmitting the token over port 44444.
+# Action/Plan: Log verified Level 24 token and prepare connection vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 24
+# Telemetry: Remote environment accepted credential token [REDACTED_L24_PASSWORD]
+# Analyst Rationale: Documenting successful privilege escalation and tracking session progression across level boundaries.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 24 -> Level 25.
+====================================
+
+# [Bandit Level 24] 
+
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 24 -> Level 25
+# Telemetry: Active Target Context: bandit24
+# Analyst Rationale: Commencing initial reconnaissance of the Level 24 user space to discover local binaries, challenge definitions, or network service constraints.
+# Action/Plan: ls -la
+====================================
+
+# [DISCOVERY] Home Directory Sterile State Analysis
+# Telemetry: ls -la returned standard shell configuration profiles only (.bashrc, .profile).
+# Analyst Rationale: No localized application files discovered. Shifting reconnaissance to the internal network stack to identify listening service sockets.
+# Action/Plan: ss -tlpn
+====================================
+
+# [DISCOVERY] Socket Enumeration Restriction and Port Targeting
+# Telemetry: ss -tlpn returned empty or restricted interface rows.
+# Analyst Rationale: Shifting to alternative port validation for the known challenge daemon on port 30002. Testing loopback responsiveness before deploying a brute-force payload.
+# Action/Plan: nc 127.0.0.1 30002
+====================================
+
+# [DISCOVERY] Challenge Service Banner Verification
+# Telemetry: I am the pincode checker for user bandit25. Please enter the password for user bandit24 and the secret pincode on a single line, separated by a space.
+# Analyst Rationale: Verified service parsing format rules. Constructing a local dictionary file containing all 10,000 numeric PIN iterations to feed into the socket stream.
+# Action/Plan: Establish an isolated staging folder in /tmp and construct the dictionary generator payload.
+====================================
+
+# [PROGRESS] Brute-Force Dictionary Staging Area Active
+# Telemetry: Active working directory confirmed: /tmp/brute_b24_1789090835
+# Analyst Rationale: Constructing a sequential list of 10,000 entries spanning 0000 to 9999. Integrating leading zeros to match the input parser rules of the daemon.
+# Action/Plan: for pin in {0000..9999}; do echo "[REDACTED_L24_PASSWORD] $pin"; done > wordlist.txt
+====================================
+
+# [PROGRESS] Wordlist Generation Complete
+# Telemetry: Shell expansion loop completed with silent status.
+# Analyst Rationale: Running statistical validation tests against wordlist.txt to confirm accurate line counts and entry formatting before initiating the network attack.
+# Action/Plan: wc -l wordlist.txt && head -n 5 wordlist.txt
+====================================
+
+# [EXPLOITATION] Automated Brute-Force Execution
+# Telemetry: Wordlist metrics verified: 10000 lines, accurate password token concatenation, and 4-digit zero-padding active.
+# Analyst Rationale: Piping the validated combination array into the active target port loop back. Suppressing 'Wrong' telemetry to capture the isolated successful flag response.
+# Action/Plan: nc 127.0.0.1 30002 < wordlist.txt | grep -v "Wrong"
+====================================
+
+# [SUCCESS] Automated Brute-Force Password Exfiltration
+# Telemetry: Correct! The password of user bandit25 is [REDACTED_L25_PASSWORD]
+# Analyst Rationale: Successfully bypassed the pincode validation check by piping a verified 10,000-entry zero-padded dictionary attack vector into loopback port 30002.
+# Action/Plan: Log confirmed Level 25 token and initialize remote authentication vector for the next architectural tier.
+====================================
+
+# [PROGRESS] Successful Authentication to Bandit Level 25
+# Telemetry: Remote environment accepted credential token [REDACTED_L25_PASSWORD]
+# Analyst Rationale: Documenting the completion of the Level 24 brute-force phase and certifying structural progression across the level boundary.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 25 -> Level 26.
+====================================
+
+# [Bandit Level 25] 
+
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 25 -> Level 26
+# Telemetry: Active Target Context: bandit25
+# Analyst Rationale: Commencing file-system enumeration within the Level 25 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: ls -la
+====================================
+
+# [DISCOVERY] Cryptographic Asset Identification
+# Telemetry: Found bandit26.sshkey with absolute owner read restrictions (-r--------).
+# Analyst Rationale: Isolated an asymmetric private key file targeting the bandit26 security tier. Inspecting key structural integrity to map out authentication bypasses.
+# Action/Plan: cat bandit26.sshkey
+====================================
+
+# [DISCOVERY] Private Key Validation and Transition Strategy
+# Telemetry: Validated complete OPENSSH PRIVATE KEY envelope structure.
+# Analyst Rationale: Constructing a local loopback SSH transaction utilizing the discovered identity key file to bypass standard authentication banners.
+# Action/Plan: ssh -i bandit26.sshkey bandit26@127.0.0.1 -p 2220
+====================================
+
+# [EXCEPTION] SSH Loopback Restriction Enforced
+# Telemetry: Connecting from/to localhost is blocked to conserve resources. Disconnected from 127.0.0.1 port 2220.
+# Analyst Rationale: Local loopback SSH connections are blocked by the game server configuration. Remediating by exfiltrating bandit26.sshkey to the local host machine to connect directly.
+# Action/Plan: Extract raw key contents to copy to local workspace configuration storage.
+====================================
+
+# [DEPLOYMENT] Local Cryptographic Key Material Instantiation
+# Telemetry: Capturing exfiltrated bandit26.sshkey structure locally.
+# Analyst Rationale: Writing private key file locally to bypass the server-side localhost block. Restricting file permissions to chmod 600 to satisfy the mandatory SSH client security compliance checks.
+# Action/Plan: Create local key file and modify DAC permissions.
+====================================
+
+# [EXCEPTION] Automated Login Profile Execution Lockout
+# Telemetry: Connection to bandit.labs.overthewire.org closed instantly after banner rendering.
+# Analyst Rationale: High probability of a custom execution script or alternate shell bound to the /etc/passwd user metadata. Appending a trailing terminal override argument to bypass the default profile initialization.
+# Action/Plan: ssh -i ~/kali_bandit26.key bandit26@bandit.labs.overthewire.org -p 2220 /bin/bash
+====================================
+
+# [EXCEPTION] Command Execution Argument Ignored by Shell Gateway
+# Telemetry: Target session drops or hangs silently when passing trailing shell paths.
+# Analyst Rationale: Remote login profile is actively ignoring direct command execution injections. Shifting to an interactive terminal manipulation strategy to trap the login shell text pager utility.
+# Action/Plan: Force visual text overflow by shrinking terminal height, then re-initiate standard SSH connection.
+====================================
+
+# [SUCCESS] Interactive Login Profile Interception
+# Telemetry: Intercepted active shell pager via terminal window constraints: --More--(66%)
+# Analyst Rationale: Trapped the automated exit routine within the text pager viewport. Launching the internal vi editor interface to initiate an operational environment escape sequence.
+# Action/Plan: Send keystroke 'v' into the paused more viewport to initialize the visual editor.
+====================================
+
+# [PROGRESS] Text Editor Sandbox Access Verified
+# Telemetry: Loaded vi text editor instance pointing to ~/text.txt [readonly]
+# Analyst Rationale: Overriding the default shell variable inside the vi command engine to break out of the text pager loop and spawn an interactive shell prompt.
+# Action/Plan: :set shell=/bin/bash followed by the :shell execution string.
+====================================
+
+# [SUCCESS] Interactive Shell Escape Accomplished
+# Telemetry: Spawned active shell environment prompt: bandit26@bandit:~$
+# Analyst Rationale: Documenting successful escape from the restricted text pager script via vi environment manipulation.
+# Action/Plan: Initialize tracking for Target Scope Bandit Level 26 -> Level 27.
+====================================
+
+# [AMENDMENT] Technical Clarification on Level 26 Authentication
+# Telemetry: Active shell prompt obtained via asymmetric key file 'bandit26.sshkey' bypass.
+# Analyst Rationale: Clarifying the operational gap for future reviewers. While 'bandit26.sshkey' provided the initial execution session, it does not contain the alphanumeric password token. We are now executing a read operation against /etc/bandit_pass/bandit26 to extract and permanently record the cleartext password string.
+# Action/Plan: Extract cleartext password string from the local system configuration directory.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 26 -> Level 27
+# Telemetry: Active Target Context: bandit26
+# Analyst Rationale: Commencing file-system enumeration within the Level 26 user workspace to discover custom binaries, user configurations, or access control parameters.
+# Action/Plan: cat /etc/bandit_pass/bandit26
+====================================
+
+# [Bandit Level 26] 
+
+ #====================================
+
+# [SUCCESS] Level 26 Cleartext Password Exfiltration
+# Telemetry: cat /etc/bandit_pass/bandit26 returned [REDACTED_L26_PASSWORD]
+# Analyst Rationale: Recovered the static alphanumeric password token for the current tier. This bridges the narrative gap from our initial asymmetric SSH key bypass, establishing verifiable proof of full level ownership.
+# Action/Plan: Log token, preserve state, and advance into the active Level 26 local file-system scanning phase.
+====================================
+
+# [DISCOVERY] SUID Privilege Escalation Vector Isolated
+# Telemetry: Found bandit27-do with explicit SUID execution bits set (-rwsr-x---) owned by bandit27.
+# Analyst Rationale: Operating system executes SUID processes under the privilege context of the file owner. Utilizing this wrapper utility to execute an authorized read operation targeting the next level's credentials.
+# Action/Plan: Run ./bandit27-do without parameters to observe the application parser specifications.
+====================================
+
+# [EXPLOITATION] SUID Context Modification and Token Extraction
+# Telemetry: Banner verification confirmed standard execution wrapper: './bandit27-do [command]'.
+# Analyst Rationale: Exploiting the SUID privilege delegation property to intercept the protected Level 27 file. Passing 'cat' as the sub-process to expose the credential token.
+# Action/Plan: ./bandit27-do cat /etc/bandit_pass/bandit27
+====================================
+
+# [SUCCESS] Level 27 Password Token Interception
+# Telemetry: ./bandit27-do cat /etc/bandit_pass/bandit27 returned STJLJBRRphMxKB392CT4iOr5CbzPU9ER
+# Analyst Rationale: Leveraged Set-User-ID (SUID) binary execution property to delegate reading permissions to the bandit27 owner profile, successfully exfiltrating the final cleartext token.
+====================================
+
+:::: SESSION CLOSURE SUMMARY ::::
+------------------------------------
+All targeted scopes for this testing window have been successfully explored, resolved, and audited.
+Session Concluded: 2026-09-11 00:12:22 EDT
+Final State: Target Scope Bandit Level 26 -> Level 27 COMPLETED.
+====================================
+
+# [PHASE NAME] Scope Initialization: Bandit Level 27 -> Level 28
